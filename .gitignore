@@ -1,0 +1,159 @@
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+# =========================
+# Operating System Files
+# =========================
+
+# OSX
+# =========================
+
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+
+# --- user defined ignored files --- #
+*.lib
+*.a
+*.o
+*.so
+*.dll
+*.dylib
+*.pdb
+*.ilk
+*.exp
+*.tlog
+*.obj
+*.stash
+*.exe
+
+*.cache
+*.bin
+
+moc_*
+
+Makefile*
+!Makefile.header
+
+# intermediate qt file dir
+.moc/
+.obj/
+.rcc/
+.ui/
+tsp*/*.pro.user
+tsp*/*.pro.user.*
+tsp*/*.user
+*.pro.user
+*.pro.user.*
+*.user
+*.TMP
+lib_x64/
+
+*.sdf
+*.suo
+*.opensdf
+!*.vcxproj
+*.vcxproj.*
+GeneratedFiles/
+x64/
+
+*.plt
+moc_*
+*.autosave
+
+processes.run/
+lib_x64/
+lib-lnx-x64/
+lib-win-x64/
+lib-mac-x64/
+lib-osx-x64/
+processes.surrogate/
+processes.run/
+__pycache__/
+
+
+armadillo*/
+
+3rd/armadillo*/
+3rd/ogdf*/
+
+*.db
+*.pro.user
+maintev/*.pro.user
+
+!examples/*.db
+!examples/*.xlsx
+
+bin/
+*.mtvdb
+!*.sln
+src/aos-plugins/plugins/debug/
+*.pdf
+
+.vs/
+debug/
+release/
+ui_*
+
+*.~vsdx
+aOS-Kernel-Assets/
+aOS-Kernel-UX/
+aOS-Kernel-3rd/
+aOS-Kernel-3rd-Linux/
+aOS-Kernel-grpc/
+
+installer/
+pull-dev.sh
+pull.sh
+push.sh
+
+*.zip
+*.opt
+
+3rd/
+protos/
+grpc/
+
+!dtl-master.zip
+
+*.qm
+
+*.cppcheck
+*-cppcheck-build-dir/
+
+3rdparty/
