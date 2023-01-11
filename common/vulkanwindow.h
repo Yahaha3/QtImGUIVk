@@ -15,11 +15,22 @@ public:
     ImGuiVulkanWidget(VulkanWindow* w, QWidget* parent = NULL);
     void set_clear_color(ImVec4 color);
     ImVec4 clear_color() const;
+    VulkanWindow* window() const;
+
+signals:
+    void sig_window_event(QEvent* e);
+
 protected:
+    virtual void init_window(){};
     virtual void paint();
+    virtual void release_window(){};
+    virtual void vulkan_window_ready(){};
 
 private slots:
     void slot_readypaint();
+    void slot_window_init();
+    void slot_window_release();
+    void slot_vulkan_window_ready();
 
 private:
     VulkanWindow *m_window;
@@ -56,6 +67,8 @@ protected:
     QVulkanFunctions* m_func;
     ImGui_ImplVulkanH_Window* wd_;
     ImGuiContext* ctx;
+    // stage
+    VkDescriptorPool vk_descript_pool_ = VK_NULL_HANDLE;
 
     double       gtime = 0.0f;
     bool         g_mouse_pressed[3] = { false, false, false };
@@ -77,9 +90,14 @@ public:
     bool event(QEvent *) override;
     void set_clear_color(ImVec4 color);
     ImVec4 clear_color() const;
+    VkDescriptorPool descript_pool() const;
 signals:
       void sig_readypaint();
+      void sig_window_init();
+      void sig_window_release();
       void sig_window_event(QEvent *);
+      // qvulkanwindow ready like cmdbuf
+      void sig_window_init_ready();
 
 private:
       QVulkanWindowRenderer* render_ = NULL;

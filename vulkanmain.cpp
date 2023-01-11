@@ -2,6 +2,7 @@
 #include <QVulkanInstance>
 #include <iostream>
 #include "common/vulkanwindow.h"
+#include "Demo/demowidget.h"
 
 int main(int argc, char *argv[]){
     QApplication app(argc, argv);
@@ -15,7 +16,7 @@ int main(int argc, char *argv[]){
     VulkanWindow* window = new VulkanWindow;
     window->setVulkanInstance(&inst);
 
-    ImGuiVulkanWidget* widget = new ImGuiVulkanWidget(window);
+    DemoWidget* widget = new DemoWidget(window);
     widget->resize(1200, 800);
     widget->show();
 

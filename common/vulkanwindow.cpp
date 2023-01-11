@@ -83,6 +83,8 @@ void QVulkanRenderer::initResources()
     for (ImGuiKey key : keyMap.values()) {
         io.KeyMap[key] = key;
     }
+
+    emit dynamic_cast<VulkanWindow*>(m_window)->sig_window_init();
 }
 
 void QVulkanRenderer::startNextFrame()
@@ -107,6 +109,8 @@ void QVulkanRenderer::releaseResources()
     ImGui::DestroyContext();
 
     ImGui_ImplVulkanH_DestroyQWindow(device, wd_, NULL);
+
+    emit dynamic_cast<VulkanWindow*>(m_window)->sig_window_release();
 }
 
 void QVulkanRenderer::on_mouse_pressed_change(QMouseEvent *event)
@@ -187,7 +191,7 @@ void QVulkanRenderer::init()
     auto renderpass = m_window->defaultRenderPass();
 //    auto cmdpool = m_window->graphicsCommandPool();
     auto cmdbuf = m_window->currentCommandBuffer();
-    VkDescriptorPool dpool = VK_NULL_HANDLE;
+//    VkDescriptorPool dpool = VK_NULL_HANDLE;
 
     auto qfamily = 0;
     {
@@ -243,7 +247,7 @@ void QVulkanRenderer::init()
         pool_info.maxSets = 1000 * IM_ARRAYSIZE(pool_sizes);
         pool_info.poolSizeCount = (uint32_t)IM_ARRAYSIZE(pool_sizes);
         pool_info.pPoolSizes = pool_sizes;
-        err = m_dev_func->vkCreateDescriptorPool(device, &pool_info, NULL, &dpool);
+        err = m_dev_func->vkCreateDescriptorPool(device, &pool_info, NULL, &vk_descript_pool_);
         check_vk_result(err);
     }
 
@@ -262,7 +266,7 @@ void QVulkanRenderer::init()
     init_info.QueueFamily = qfamily;
     init_info.Queue = queue;
     init_info.PipelineCache = VK_NULL_HANDLE;
-    init_info.DescriptorPool = dpool;
+    init_info.DescriptorPool = vk_descript_pool_;
     init_info.Subpass = 0;
     init_info.MinImageCount = min_image_count;
     init_info.ImageCount = min_image_count;
@@ -271,10 +275,16 @@ void QVulkanRenderer::init()
     init_info.CheckVkResultFn = check_vk_result;
     ImGui_ImplVulkan_Init(&init_info, wd_->RenderPass);
 
+    io.Fonts->AddFontFromFileTTF("D:/github/QtImGUIVk/3rdparty/font/simhei.ttf", 13, NULL, io.Fonts->GetGlyphRangesDefault());
     {
         ImGui_ImplVulkan_CreateFontsTexture(cmdbuf);
         ImGui_ImplVulkan_DestroyFontUploadObjects();
     }
+//    io.Fonts->AddFontFromFileTTF("D:/github/QtImGUIVk/3rdparty/font/simhei.ttf", 13, NULL, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+//    io.Fonts->Build();
+
+    // after imgui init
+    emit dynamic_cast<VulkanWindow*>(m_window)->sig_window_init_ready();
 }
 
 void QVulkanRenderer::update()
@@ -473,6 +483,13 @@ ImVec4 VulkanWindow::clear_color() const
     return clear_color_;
 }
 
+VkDescriptorPool VulkanWindow::descript_pool() const
+{
+    auto rd = dynamic_cast<QVulkanRenderer*>(render_);
+    if(rd) return rd->vk_descript_pool_;
+    return VK_NULL_HANDLE;
+}
+
 ImGuiVulkanWidget::ImGuiVulkanWidget(VulkanWindow *w, QWidget *parent)
     : QWidget(parent)
     , m_window(w)
@@ -480,6 +497,10 @@ ImGuiVulkanWidget::ImGuiVulkanWidget(VulkanWindow *w, QWidget *parent)
     m_window->set_clear_color(ImVec4(0.45f, 0.55f, 0.60f, 1.00f));
     auto wapper = QWidget::createWindowContainer(w, parent);
     connect(m_window, &VulkanWindow::sig_readypaint, this, &ImGuiVulkanWidget::slot_readypaint);
+    connect(m_window, &VulkanWindow::sig_window_init, this, &ImGuiVulkanWidget::slot_window_init);
+    connect(m_window, &VulkanWindow::sig_window_release, this, &ImGuiVulkanWidget::slot_window_release);
+    connect(m_window, &VulkanWindow::sig_window_event, this, &ImGuiVulkanWidget::sig_window_event);
+    connect(m_window, &VulkanWindow::sig_window_init_ready, this, &ImGuiVulkanWidget::slot_vulkan_window_ready);
     auto layout = new QHBoxLayout;
     layout->addWidget(wapper);
     layout->setContentsMargins(0,0,0,0);
@@ -494,6 +515,11 @@ void ImGuiVulkanWidget::set_clear_color(ImVec4 color)
 ImVec4 ImGuiVulkanWidget::clear_color() const
 {
     return m_window->clear_color();
+}
+
+VulkanWindow *ImGuiVulkanWidget::window() const
+{
+    return m_window;
 }
 
 void ImGuiVulkanWidget::paint()
@@ -542,4 +568,19 @@ void ImGuiVulkanWidget::paint()
 void ImGuiVulkanWidget::slot_readypaint()
 {
     paint();
+}
+
+void ImGuiVulkanWidget::slot_window_init()
+{
+    init_window();
+}
+
+void ImGuiVulkanWidget::slot_window_release()
+{
+    release_window();
+}
+
+void ImGuiVulkanWidget::slot_vulkan_window_ready()
+{
+    vulkan_window_ready();
 }
