@@ -48,14 +48,18 @@ struct ImageVk
         return LoadFromBytearry(origin_.data(), origin_.size());
     }
 
-    ImTextureID get_image_texture(){
-        return ID;
+    ImTextureID get_image_texture(bool& ok){
+        VkResult err;
+        ImTextureID id = ImGui_ImplVulkan_GetImTextureID(ID, err);
+        ok = true;
+        if(err != VK_SUCCESS) ok = false;
+        return id;
     }
 
     int Width;
     int Height;
 
 private:
-    ImTextureID ID;
+    VKuint ID;
     std::string origin_;
 };

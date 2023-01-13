@@ -1,6 +1,7 @@
 #ifndef DEMOWIDGET_H
 #define DEMOWIDGET_H
 
+//#include "GeoMap.h"
 #include "common/vulkanwindow.h"
 
 class ImageVk;
@@ -29,6 +30,8 @@ private:
     bool debug = false;
 
     std::shared_ptr<ImageVk> image_vk;
+
+//    std::shared_ptr<clz::GeoMap> m_map;
 };
 
 #endif // DEMOWIDGET_H

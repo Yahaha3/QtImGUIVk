@@ -6,6 +6,7 @@
 #include <QFile>
 #include <QCoreApplication>
 #include <QVulkanFunctions>
+//#include "GeoMap.h"
 #include "backends/imgui_impl_vulkan.h"
 
 //using namespace ImGui;
@@ -15,6 +16,7 @@ DemoWidget::DemoWidget(VulkanWindow *w, QWidget *parent) :ImGuiVulkanWidget(w, p
     set_clear_color(ImVec4(0.2f, 0.3f, 0.5f, 1));
 
     image_vk = std::make_shared<ImageVk>();
+//    m_map.reset(new clz::GeoMap());
 }
 
 void DemoWidget::paint()
@@ -161,9 +163,14 @@ void DemoWidget::paint_map()
             ImGui::SliderFloat2("UV0", &uv0.x, -2, 2, "%.1f");
             ImGui::SliderFloat2("UV1", &uv1.x, -2, 2, "%.1f");
             ImGui::ColorEdit4("Tint",&tint.x);
-            ImPlot::PlotImage("##Images", image_vk->get_image_texture(), bmin,bmax, uv0, uv1, tint);
+            bool ok = false;
+            auto ID = image_vk->get_image_texture(ok);
+            if(ok){
+                ImPlot::PlotImage("##Images", ID, bmin,bmax, uv0, uv1, tint);
+            }
         }
         // draw map
+//        auto region = m_map->get_region(limits, size);
 
         ImPlot::PushPlotClipRect();
         static const char* label = " OpenStreetMap Contributors";
@@ -176,8 +183,4 @@ void DemoWidget::paint_map()
 //    ImPlot::ShowDemoWindow();
     ImGui::End();
 }
-
-
-
-
 

@@ -37,6 +37,7 @@ INCLUDEPATH += ./3rdparty/implot
 
 
 SOURCES += \
+    Demo/GeoMap.cpp \
     Demo/demowidget.cpp \
     common/vulkanwindow.cpp \
     vulkanmain.cpp
@@ -48,6 +49,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 win32:QMAKE_CXXFLAGS += /bigobj
 
 HEADERS += \
+    Demo/GeoMap.h \
     Demo/demowidget.h \
     common/Image.h \
     common/vulkanwindow.h
