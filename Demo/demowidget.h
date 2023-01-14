@@ -1,10 +1,12 @@
 #ifndef DEMOWIDGET_H
 #define DEMOWIDGET_H
 
-//#include "GeoMap.h"
 #include "common/vulkanwindow.h"
 
-class ImageVk;
+namespace clz {
+class GeoMap;
+}
+//class ImageVk;
 
 class DemoWidget : public ImGuiVulkanWidget
 {
@@ -29,9 +31,9 @@ private:
     int renders = 0;
     bool debug = false;
 
-    std::shared_ptr<ImageVk> image_vk;
+//    std::shared_ptr<ImageVk> image_vk;
 
-//    std::shared_ptr<clz::GeoMap> m_map;
+    std::shared_ptr<clz::GeoMap> m_map;
 };
 
 #endif // DEMOWIDGET_H

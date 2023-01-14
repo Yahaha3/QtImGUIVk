@@ -1,9 +1,9 @@
 #pragma once
 #define STB_IMAGE_IMPLEMENTATION
 #include <vulkan/vulkan.h>
+#include <stb/stb_image.h>
 #include <imgui.h>
 #include <iostream>
-#include <stb/stb_image.h>
 #include "backends/imgui_impl_vulkan.h"
 
 struct ImageVk
