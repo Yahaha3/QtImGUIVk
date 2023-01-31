@@ -5,33 +5,15 @@
 #include <QVector>
 #include "implot.h"
 //#include "imgui.h"
-
-class ImageVk;
+#include <mutex>
+#include <QMap>
+#include "MapThread/MapRequestThread.h"
 
 namespace clz {
 
 #define PI 3.14159265359
 #define TILE_SIZE    256
 #define MAX_ZOOM      19
-
-
-struct TilePos {
-    int x, y, z;
-};
-
-enum TileState : int {
-    Unavailable = 0, // tile not available
-    Loaded,          // tile has been loaded into  memory
-    Downloading,     // tile is downloading from server
-    OnDisk           // tile is saved to disk, but not loaded into memory
-};
-
-typedef ImageVk TileImage;
-struct Tile {
-    Tile() : state(TileState::Unavailable) {  }
-    std::shared_ptr<TileImage> image;
-    TileState state;
-};
 
 class GeoMap
 {
@@ -40,12 +22,22 @@ public:
 
     const QVector<QPair<clz::TilePos, std::shared_ptr<clz::Tile>>>& get_region(ImPlotRect view, ImVec2 pixels);
 
+    void set_tile_origin_data(const TilePos& pos, QByteArray data);
 private:
     bool append_region(int z, double min_x, double min_y, double size_x, double size_y);
 
+    std::shared_ptr<Tile> request_tile(TilePos pos);
+    void download_tile(TilePos pos);
+    std::shared_ptr<Tile> get_tile(TilePos pos);
+    std::shared_ptr<Tile> load_tile(TilePos pos);
+
 private:
     QVector<QPair<clz::TilePos, std::shared_ptr<clz::Tile>>> m_region;
+    QMap<clz::TilePos, std::shared_ptr<clz::Tile>> m_tiles;
 
+    std::mutex m_tile_mutex;
+
+    std::shared_ptr<MapRequestThread> m_request_thread;
 };
 
 }

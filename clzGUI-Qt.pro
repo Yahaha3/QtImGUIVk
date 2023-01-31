@@ -1,6 +1,6 @@
 QT -= gui
 
-QT += widgets core
+QT += widgets core network
 
 CONFIG += c++17
 CONFIG -= app_bundle
@@ -39,6 +39,9 @@ INCLUDEPATH += ./3rdparty/implot
 SOURCES += \
     Demo/GeoMap.cpp \
     Demo/demowidget.cpp \
+    GeoFunction/LayerBackend/GeoBackend.cpp \
+    GeoFunction/LayerBackend/GeoBackendOSM.cpp \
+    MapThread/MapRequestThread.cpp \
     common/vulkanwindow.cpp \
     vulkanmain.cpp
 
@@ -51,5 +54,9 @@ win32:QMAKE_CXXFLAGS += /bigobj
 HEADERS += \
     Demo/GeoMap.h \
     Demo/demowidget.h \
+    GeoFunction/GeoMapGlobal.h \
+    GeoFunction/LayerBackend/GeoBackend.h \
+    GeoFunction/LayerBackend/GeoBackendOSM.h \
+    MapThread/MapRequestThread.h \
     common/Image.h \
     common/vulkanwindow.h
