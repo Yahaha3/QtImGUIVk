@@ -37,11 +37,28 @@ INCLUDEPATH += ./3rdparty/implot
 
 
 SOURCES += \
-    Demo/GeoMap.cpp \
+    Element/ElementContainer.cpp \
+    Element/GraphicsDrawElement.cpp \
+    Element/GraphicsElement.cpp \
+    Element/ImageDrawElement.cpp \
+    Element/Layer/GraphicsLayer.cpp \
+    Element/LinestringDrawElement.cpp \
+    GeoFunction/GeoFunctionUtility.cpp \
+    GeoFunction/GeoMapGlobal.cpp \
+    GeoFunction/LayerBackend/GeoBackendGaode.cpp \
+    GeoFunction/LayerBackend/GeoBackendGoogle.cpp \
+    Map/GeoMap.cpp \
     Demo/demowidget.cpp \
     GeoFunction/LayerBackend/GeoBackend.cpp \
     GeoFunction/LayerBackend/GeoBackendOSM.cpp \
+    Map/MapItem/MapCopyrightItem.cpp \
+    Map/MapItem/MapItem.cpp \
+    Map/MapItem/MapLabelItem.cpp \
+    Map/MapItem/MapScaleItem.cpp \
+    Map/Projection/Projection.cpp \
+    Map/Projection/ProjectionESG3857.cpp \
     MapThread/MapRequestThread.cpp \
+    common/Image.cpp \
     common/vulkanwindow.cpp \
     vulkanmain.cpp
 
@@ -52,11 +69,29 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 win32:QMAKE_CXXFLAGS += /bigobj
 
 HEADERS += \
-    Demo/GeoMap.h \
+    Element/ElementContainer.h \
+    Element/GraphicsDrawElement.h \
+    Element/GraphicsElement.h \
+    Element/ImageDrawElement.h \
+    Element/Layer/GraphicsLayer.h \
+    Element/LinestringDrawElement.h \
+    Element/element_include.h \
+    GeoFunction/GeoFunctionUtility.h \
+    GeoFunction/LayerBackend/GeoBackendGaode.h \
+    GeoFunction/LayerBackend/GeoBackendGoogle.h \
+    Map/GeoMap.h \
     Demo/demowidget.h \
     GeoFunction/GeoMapGlobal.h \
     GeoFunction/LayerBackend/GeoBackend.h \
     GeoFunction/LayerBackend/GeoBackendOSM.h \
+    Map/MapItem/MapCopyrightItem.h \
+    Map/MapItem/MapItem.h \
+    Map/MapItem/MapLabelItem.h \
+    Map/MapItem/MapScaleItem.h \
+    Map/map_include.h \
+    Map/Projection/Projection.h \
+    Map/Projection/ProjectionESG3857.h \
     MapThread/MapRequestThread.h \
     common/Image.h \
+    common/clz_geomap_global.h \
     common/vulkanwindow.h

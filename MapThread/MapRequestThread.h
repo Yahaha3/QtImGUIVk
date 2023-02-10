@@ -38,11 +38,11 @@ private:
     std::atomic<int> m_downloads;
     std::atomic<int> m_fails;
 
-    std::shared_ptr<GeoBackend> m_backend;
-
     std::shared_ptr<QNetworkAccessManager> m_net_manager;
 
     std::shared_ptr<GeoMap> m_map;
+
+    QByteArray m_test_data;
 };
 
 }

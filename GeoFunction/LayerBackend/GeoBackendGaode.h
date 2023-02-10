@@ -1,12 +1,12 @@
-#ifndef GEOBACKENDOSM_H
-#define GEOBACKENDOSM_H
+#ifndef GEOBACKENDGAODE_H
+#define GEOBACKENDGAODE_H
 
 #include "GeoBackend.h"
 
-class GeoBackendOSM : public GeoBackend
+class GeoBackendGaode: public GeoBackend
 {
 public:
-    GeoBackendOSM();
+    GeoBackendGaode();
     void init() override;
     QString build(clz::TilePos pos) override;
     int min_level() const override;
@@ -14,4 +14,4 @@ public:
     QString label() override;
 };
 
-#endif // GEOBACKENDOSM_H
+#endif // GEOBACKENDGAODE_H

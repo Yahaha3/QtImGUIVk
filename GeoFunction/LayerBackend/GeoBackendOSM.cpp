@@ -18,3 +18,18 @@ QString GeoBackendOSM::build(clz::TilePos pos)
     url.replace("${y}", QString::number(pos.y));
     return url;
 }
+
+int GeoBackendOSM::min_level() const
+{
+    return 0;
+}
+
+int GeoBackendOSM::max_level() const
+{
+    return 19;
+}
+
+QString GeoBackendOSM::label()
+{
+    return " OpenStreetMap Contributors";
+}

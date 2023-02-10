@@ -453,6 +453,7 @@ QVulkanWindowRenderer *VulkanWindow::createRenderer()
 
 bool VulkanWindow::event(QEvent *e)
 {
+    auto type = e->type();
     auto res = QVulkanWindow::event(e);
     emit sig_window_event(e);
 

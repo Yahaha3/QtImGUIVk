@@ -6,8 +6,9 @@
 #include <QFile>
 #include <QCoreApplication>
 #include <QVulkanFunctions>
-#include "GeoMap.h"
+#include "Map/GeoMap.h"
 #include "backends/imgui_impl_vulkan.h"
+#include "GeoFunction/GeoFunctionUtility.h"
 
 //using namespace ImGui;
 
@@ -141,42 +142,15 @@ void DemoWidget::paint_map()
         ImGui::Text("FPS: %.2f Renders: %d", ImGui::GetIO().Framerate, renders);
     }
 
-    ImPlotAxisFlags ax_flags = ImPlotAxisFlags_NoLabel | ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoGridLines| ImPlotAxisFlags_Foreground;
-    if(ImPlot::BeginPlot("##Map",ImVec2(-1,-1), ImPlotFlags_Equal/* | ImPlotFlags_NoMousePos*/)){
+    ImPlotAxisFlags ax_flags = ImPlotAxisFlags_NoLabel | ImPlotAxisFlags_NoTickLabels |
+                               ImPlotAxisFlags_NoGridLines| ImPlotAxisFlags_Foreground;
+    if(ImPlot::BeginPlot("##Map",ImVec2(-1,-1), ImPlotFlags_Equal | ImPlotFlags_NoMouseText)){
         ImPlot::SetupAxes(NULL,NULL,ax_flags,ax_flags|ImPlotAxisFlags_Invert);
         ImPlot::SetupAxesLimits(0,1,0,1);
-        auto pos  = ImPlot::GetPlotPos();
-        auto size = ImPlot::GetPlotSize();
-        auto limits = ImPlot::GetPlotLimits();
-        renders = 0;
-        if (debug) {
-            float ys[] = {1,1};
-            ImPlot::SetNextFillStyle({0.3,0.4,0.5,0.2},0.5f);
-            ImPlot::PlotShaded("##Bounds",ys,2);
-            static ImVec2 bmin(1,1);
-            static ImVec2 bmax(0,0);
-            static ImVec2 uv0(0,0);
-            static ImVec2 uv1(1,1);
-            static ImVec4 tint(1,1,1,1);
-            ImGui::SliderFloat2("Min", &bmin.x, -2, 2, "%.1f");
-            ImGui::SliderFloat2("Max", &bmax.x, -2, 2, "%.1f");
-            ImGui::SliderFloat2("UV0", &uv0.x, -2, 2, "%.1f");
-            ImGui::SliderFloat2("UV1", &uv1.x, -2, 2, "%.1f");
-            ImGui::ColorEdit4("Tint",&tint.x);
-            bool ok = false;
-//            auto ID = image_vk->get_image_texture(ok);
-//            if(ok){
-//                ImPlot::PlotImage("##Images", ID, bmin,bmax, uv0, uv1, tint);
-//            }
-        }
-        // draw map
-        auto region = m_map->get_region(limits, size);
-
+        m_map->update_tiles();
         ImPlot::PushPlotClipRect();
-        static const char* label = " OpenStreetMap Contributors";
-        auto label_size = ImGui::CalcTextSize(label);
-        auto label_off  = ImPlot::GetStyle().MousePosPadding;
-        ImPlot::GetPlotDrawList()->AddText({pos.x + label_off.x, pos.y+size.y-label_size.y-label_off.y},IM_COL32_BLACK,label);
+        m_map->test();
+        m_map->update_items();
         ImPlot::PopPlotClipRect();
         ImPlot::EndPlot();
     }
