@@ -94,6 +94,11 @@ void clz::MapRequestThread::add_request(clz::TilePos tilepos)
 #endif
 }
 
+QByteArray clz::MapRequestThread::get_test_data() const
+{
+    return m_test_data;
+}
+
 void clz::MapRequestThread::slot_network_request_reply(QNetworkReply *reply)
 {
     if (reply->error() != QNetworkReply::NoError) {

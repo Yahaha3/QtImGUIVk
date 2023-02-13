@@ -24,6 +24,7 @@ public:
     void start(int num);
     void stop();
     void add_request(TilePos tilepos);
+    QByteArray get_test_data() const;
 
 private slots:
     void slot_network_request_reply(QNetworkReply* reply);

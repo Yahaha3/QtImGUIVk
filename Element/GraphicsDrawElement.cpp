@@ -40,12 +40,12 @@ bool clz::GraphicsDrawElement::is_flag(clz::ItemFlag flag) const
 
 void clz::GraphicsDrawElement::refresh()
 {
-
+    element_projection();
 }
 
 void clz::GraphicsDrawElement::repaint()
 {
-
+    paint();
 }
 
 clz::GeoPos clz::GraphicsDrawElement::center()

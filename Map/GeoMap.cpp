@@ -117,17 +117,37 @@ ImPlotPoint GeoMap::geopos2implot(GeoPos pt)
     auto plot_pos = clz::GeoFunctionUtility::scene2implot(ImPlotPoint(scene_pos.x(), scene_pos.y()));
     return plot_pos;
 }
+#include <QCoreApplication>
 
 void GeoMap::test()
 {
-    static clz::LinestringDrawElement* line = nullptr;
-    if(!line){
-        QVector<clz::GeoPos> vertices;
-        vertices.append(clz::GeoPos(30, 60));
-        vertices.append(clz::GeoPos(30, 120));
-        line = new clz::LinestringDrawElement(vertices);
+//    static clz::LinestringDrawElement* line = nullptr;
+//    if(!line){
+//        QVector<clz::GeoPos> vertices;
+//        vertices.append(clz::GeoPos(30, 60));
+//        vertices.append(clz::GeoPos(30, 120));
+//        line = new clz::LinestringDrawElement(vertices);
+//    }
+//    line->paint();
+
+    static clz::ImageDrawElement* image = nullptr;
+    if(!image){
+        image = new ImageDrawElement();
+        auto path = QCoreApplication::applicationDirPath() + "/plane.png";
+        QFile file(path);
+        if (file.open(QFile::ReadOnly))
+        {
+            auto data = file.readAll();
+            image->load_image(data);
+            image->set_flag(IgnoreScale);
+            image->set_geometry(GeoPos(30,103), QSize(40, 40), QPoint(), 0);
+        }
     }
-    line->paint();
+    static float angle = 0;
+    image->set_geometry(GeoPos(30,103), angle);
+    angle += 0.01;
+//    image->refresh();
+    image->paint();
 }
 
 void GeoMap::update_tiles()
@@ -136,6 +156,7 @@ void GeoMap::update_tiles()
     if(ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_A))){
         debug = !debug;
     }
+
     auto size = ImPlot::GetPlotSize();
     auto limits = ImPlot::GetPlotLimits();
     auto region = get_region(limits, size);

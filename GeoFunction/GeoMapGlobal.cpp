@@ -171,6 +171,13 @@ clz::GeoPos clz::GeoRect::bottomRight() const
     return mBottomRight;
 }
 
+clz::GeoPos clz::GeoRect::center()
+{
+    auto complex_lon = mBottomRight.longitude() - mTopLeft.longitude();
+    auto complex_lat = mTopLeft.latitude() - mBottomRight.latitude();
+    return GeoPos(mTopLeft.latitude() - complex_lat/2, mTopLeft.longitude() + complex_lon/2);
+}
+
 clz::ImPlotPointArray::ImPlotPointArray(int size)
 {
     m_array_size = size;

@@ -22,8 +22,6 @@ public:
 
     void refresh();
     void repaint();
-    virtual void element_projection() = 0;
-    virtual QRectF proj_shape() const = 0;
     virtual void paint() = 0;
 
     clz::GeoPos center();
@@ -36,6 +34,11 @@ public:
     void set_front_color(const QColor& color);
     ImVec4 get_back_color() const;
     ImVec4 get_front_color() const;
+
+protected:
+    virtual void element_projection() = 0;
+    virtual QRectF proj_shape() const = 0;
+
 protected:
     // 地理坐标,投影坐标,plot坐标
     QVector<clz::GeoPos> m_vertices;

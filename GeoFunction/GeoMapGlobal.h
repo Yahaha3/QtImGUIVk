@@ -188,6 +188,8 @@ public:
     GeoPos topLeft() const;
     GeoPos bottomRight() const;
 
+    GeoPos center();
+
 private:
     GeoPos mTopLeft;
     GeoPos mBottomRight;

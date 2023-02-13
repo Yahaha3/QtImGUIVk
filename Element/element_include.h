@@ -6,6 +6,7 @@
 #include "Element/GraphicsDrawElement.h"
 #include "Element/GraphicsElement.h"
 #include "Element/LinestringDrawElement.h"
+#include "Element/ImageDrawElement.h"
 
 #include "Element/Layer/GraphicsLayer.h"
 
