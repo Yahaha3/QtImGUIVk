@@ -106,12 +106,6 @@ processes.surrogate/
 processes.run/
 __pycache__/
 
-
-armadillo*/
-
-3rd/armadillo*/
-3rd/ogdf*/
-
 *.db
 *.pro.user
 maintev/*.pro.user
@@ -131,23 +125,9 @@ release/
 ui_*
 
 *.~vsdx
-aOS-Kernel-Assets/
-aOS-Kernel-UX/
-aOS-Kernel-3rd/
-aOS-Kernel-3rd-Linux/
-aOS-Kernel-grpc/
-
-installer/
-pull-dev.sh
-pull.sh
-push.sh
 
 *.zip
 *.opt
-
-3rd/
-protos/
-grpc/
 
 !dtl-master.zip
 
