@@ -1,5 +1,4 @@
 
-#include "common/Image.h"
 #include "GeoMap.h"
 #include "GeoFunction/LayerBackend/GeoBackendGaode.h"
 #include "Projection/ProjectionESG3857.h"
@@ -32,6 +31,7 @@ GeoMap::GeoMap()
     m_request_thread = std::make_shared<MapRequestThread>(this);
     m_backend = std::make_shared<GeoBackendGaode>();
     m_root_item = std::make_shared<RootElement>(this);
+    m_tile_manager = std::make_shared<TileManager>(this);
     set_map_projection(new ProjectionESG3857());
     init_map_items();
 
@@ -65,28 +65,6 @@ const QVector<QPair<TilePos, std::shared_ptr<Tile> > > &GeoMap::get_region(ImPlo
     return m_region;
 }
 
-void GeoMap::set_tile_origin_data(const TilePos &pos, QByteArray data)
-{
-    auto tile = get_tile(pos);
-    if(tile->state == Unavailable && !tile->image){
-        tile->image = std::make_shared<TileImage>();
-        tile->image->set_origin_data(data.toStdString());
-        tile->state = Ready;
-    }
-//    load_tile(pos);
-}
-
-ImTextureID GeoMap::get_tile_texture_id(const TilePos &pos, bool &ok)
-{
-    ok = false;
-    auto tile = get_tile(pos);
-    if(tile->image){
-        auto ID = tile->image->get_image_texture(ok);
-        if(ok){ return ID; }
-    }
-    return nullptr;
-}
-
 std::shared_ptr<GeoBackend> GeoMap::geo_backend() const
 {
     return m_backend;
@@ -100,6 +78,16 @@ void GeoMap::set_map_projection(Projection *projection)
 std::shared_ptr<Projection> GeoMap::get_map_projection() const
 {
     return m_map_projection;
+}
+
+std::shared_ptr<MapRequestThread> GeoMap::get_request_thread() const
+{
+    return m_request_thread;
+}
+
+int GeoMap::current_zoom() const
+{
+    return m_zoom;
 }
 
 GeoPos GeoMap::implot2geopos(ImPlotPoint pt)
@@ -169,7 +157,7 @@ void GeoMap::update_tiles()
                                 (position.x % 2 != 0 && position.y %2 == 0)) ?
                        ImVec4(1,0,1,1) : ImVec4(1,1,0,1) : ImVec4(1,1,1,1);
             bool ok = false;
-            auto ID = get_tile_texture_id(position, ok);
+            auto ID = get_tile_manager()->get_tile_texture_id(position, ok);
             if(ok){
                 ImPlot::PlotImage("##Tiles", ID, bmin, bmax, {0,0}, {1,1}, col);
                 if (debug)
@@ -185,6 +173,11 @@ void GeoMap::update_items()
     for(auto item: m_map_items){
         item->paint();
     }
+}
+
+std::shared_ptr<TileManager> GeoMap::get_tile_manager() const
+{
+    return m_tile_manager;
 }
 
 bool GeoMap::append_region(int z, double min_x, double min_y, double size_x, double size_y)
@@ -203,14 +196,14 @@ bool GeoMap::append_region(int z, double min_x, double min_y, double size_x, dou
     for(int x = xa; x < xb; x++){
         for(int y = ya; y < yb; y++){
             TilePos pos(x, y, z);
-            std::shared_ptr<Tile> tile = request_tile(pos);
+            std::shared_ptr<Tile> tile = get_tile_manager()->request_tile(pos);
             use_tile.append(pos);
 
             ok = true;
             if(tile == nullptr || tile->state != TileState::Loaded){
                 ok = false;
                 TilePos parent_pos;
-                tile = get_parent_tile(pos, ok);
+                tile = get_tile_manager()->get_parent_tile(pos, ok);
                 covered = false;
                 if(ok){
                     use_tile.append(pos);
@@ -223,135 +216,8 @@ bool GeoMap::append_region(int z, double min_x, double min_y, double size_x, dou
             if(ok){m_region.push_back({pos, tile});}
         }
     }
-    remove_out_of_view(use_tile, z);
+    get_tile_manager()->remove_out_of_view(use_tile, z);
     return covered;
-}
-
-std::shared_ptr<Tile> GeoMap::request_tile(TilePos pos)
-{
-//    std::lock_guard<std::mutex> lock(m_tile_mutex);
-    if(contains_tile(pos)){
-        return get_tile(pos);
-    } else {
-        download_tile(pos);
-    }
-    return nullptr;
-
-}
-
-void GeoMap::download_tile(TilePos pos)
-{
-    m_request_thread->add_request(pos);
-}
-
-std::shared_ptr<Tile> GeoMap::get_tile(TilePos pos)
-{
-    if(!contains_tile(pos) || !m_tiles[pos.z][pos]){
-        m_tiles[pos.z][pos] = std::make_shared<clz::Tile>();
-    }
-    if(m_tiles[pos.z][pos]->state == Loaded){
-        return m_tiles[pos.z][pos];
-    } else if(m_tiles[pos.z][pos]->state == Ready){
-        return load_tile(pos);
-    }
-    return m_tiles[pos.z][pos];
-}
-
-std::shared_ptr<Tile> GeoMap::load_tile(TilePos pos)
-{
-    if(m_tiles[pos.z][pos]->image->loadFromOrigin()){
-        m_tiles[pos.z][pos]->state = Loaded;
-        // 在完成加载后需要清除上下关联的瓦片
-        clear_relative_tile(pos);
-        return m_tiles[pos.z][pos];
-    }
-    return nullptr;
-}
-
-std::shared_ptr<Tile> GeoMap::get_parent_tile(TilePos &pos, bool &ok)
-{
-    bool result = true;
-    while (!ok && result) {
-        pos = pos.parent(pos.z - 1, result);
-        if(contains_tile(pos)){
-            ok = true;
-            break;
-        }
-    }
-    return m_tiles[pos.z][pos];
-}
-
-bool GeoMap::contains_tile(TilePos pos)
-{
-    bool level_contains, tile_contains;
-    level_contains = m_tiles.contains(pos.z);
-    if(level_contains){
-        tile_contains = m_tiles[pos.z].keys().contains(pos);
-    }
-    return level_contains && tile_contains;
-}
-
-void GeoMap::clear_relative_tile(TilePos pos)
-{
-    // 1, 移除被当前瓦片覆盖的所有瓦片,即当前瓦片之下的瓦片
-    {
-        const int from = pos.z + 1;
-        const int to = m_backend->max_level();
-        for(int zz = from; zz <= to; ++zz){
-            auto tiles = existing_tiles(zz);
-            for(auto target: tiles){
-                if(pos.contains(target)){
-                    remove_tile(target);
-                }
-            }
-        }
-    }
-    // 2, 若在当前瓦片之上,则要首先计算当前瓦片之上的瓦片是否已被全部覆盖,若是则可以移除
-    {
-        const int from = m_backend->min_level();
-        const int to = pos.z - 1;
-        for(int zz = from; zz <= to; ++zz){
-            auto tiles = existing_tiles(zz);
-            for(auto target: tiles){
-                if(target.contains(pos))
-                {
-                    const int zoom_delta = m_zoom - target.z + 1;
-                    const int ncount = static_cast<int>(pow(2, zoom_delta));
-                    int count = ncount;
-                    auto current_tiles = existing_tiles(m_zoom);
-                    for(auto tile: current_tiles){
-                        if(target.contains(tile)) {count--;}
-                        if(count == 0) break;
-                    }
-                    if(count == 0){remove_tile(target);}
-                }
-            }
-        }
-    }
-}
-
-QList<TilePos> GeoMap::existing_tiles(int zoom) const
-{
-    if(!m_tiles.contains(zoom)) return QList<TilePos>();
-    return m_tiles[zoom].keys();
-}
-
-void GeoMap::remove_out_of_view(QList<TilePos> exist, int zoom)
-{
-    auto tiles = existing_tiles(zoom);
-    for(auto tile: tiles){
-        if(!exist.contains(tile)){
-            remove_tile(tile);
-        }
-    }
-}
-
-void GeoMap::remove_tile(TilePos pos)
-{
-    if(contains_tile(pos)){
-        auto tile = m_tiles[pos.z].take(pos);
-        tile.reset();
-    }
 }
 
 void GeoMap::init_map_items()

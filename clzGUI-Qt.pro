@@ -57,6 +57,7 @@ SOURCES += \
     Map/MapItem/MapScaleItem.cpp \
     Map/Projection/Projection.cpp \
     Map/Projection/ProjectionESG3857.cpp \
+    Map/TileManager.cpp \
     MapThread/MapRequestThread.cpp \
     common/Image.cpp \
     common/vulkanwindow.cpp \
@@ -88,6 +89,7 @@ HEADERS += \
     Map/MapItem/MapItem.h \
     Map/MapItem/MapLabelItem.h \
     Map/MapItem/MapScaleItem.h \
+    Map/TileManager.h \
     Map/map_include.h \
     Map/Projection/Projection.h \
     Map/Projection/ProjectionESG3857.h \

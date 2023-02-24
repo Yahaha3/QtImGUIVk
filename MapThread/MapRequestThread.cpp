@@ -1,6 +1,7 @@
 #include "MapRequestThread.h"
 #include "GeoFunction/LayerBackend/GeoBackendOSM.h"
 #include "Map/GeoMap.h"
+#include "Map/TileManager.h"
 #include <QCoreApplication>
 #include <QFile>
 
@@ -56,7 +57,7 @@ void clz::MapRequestThread::start(int num)
                 one = std::move(m_queue.front());
                 m_queue.pop();
                 if(m_map){
-                    m_map->set_tile_origin_data(one, m_test_data);
+                    m_map->get_tile_manager()->set_tile_origin_data(one, m_test_data);
                 }
                 m_working++;
 //                bool success = false;
@@ -89,7 +90,7 @@ void clz::MapRequestThread::add_request(clz::TilePos tilepos)
 //        std::unique_lock<std::mutex> lock(m_queue_mutex);
 //        m_queue.emplace(tilepos);
     if(m_map){
-        m_map->set_tile_origin_data(tilepos, m_test_data);
+        m_map->get_tile_manager()->set_tile_origin_data(tilepos, m_test_data);
     }
 #endif
 }
@@ -107,7 +108,7 @@ void clz::MapRequestThread::slot_network_request_reply(QNetworkReply *reply)
     const auto info = reply->readAll();
     const auto tilePos = reply->property("TILE_POS").value<TilePos>();
     if(m_map){
-        m_map->set_tile_origin_data(tilePos, info);
+        m_map->get_tile_manager()->set_tile_origin_data(tilePos, info);
     }
     reply->abort();
     reply->close();

@@ -135,6 +135,7 @@ void DemoWidget::paint_map()
         debug = !debug;
     }
 
+//    this->window()->test();
     ImGui::SetNextWindowPos({0,0});
     ImGui::SetNextWindowSize(ImVec2(this->size().width(), this->size().height()));
     ImGui::Begin("Map", 0, ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoTitleBar);

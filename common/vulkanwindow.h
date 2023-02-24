@@ -45,6 +45,8 @@ public:
     void startNextFrame() override;
     void releaseResources() override;
 
+    void logicalDeviceLost() override;
+
 protected:
     void on_mouse_pressed_change(QMouseEvent* event);
     void on_wheel(QWheelEvent* event);
@@ -60,7 +62,7 @@ private:
     void imgui_qvulkan_new_frame();
     void set_cursor_pos(const ImGuiIO& io);
     void update_cursor_shape(const ImGuiIO& io);
-
+    void test();
 protected:
     QVulkanWindow *m_window;
     QVulkanDeviceFunctions* m_dev_func;
@@ -91,6 +93,7 @@ public:
     void set_clear_color(ImVec4 color);
     ImVec4 clear_color() const;
     VkDescriptorPool descript_pool() const;
+    void test();
 signals:
       void sig_readypaint();
       void sig_window_init();

@@ -95,6 +95,18 @@ void QVulkanRenderer::startNextFrame()
     } else {
         update();
     }
+//    auto cmdbuf = m_window->currentCommandBuffer();
+//    auto queue = m_window->graphicsQueue();
+//    VkSubmitInfo submitInfo;
+//    memset(&submitInfo, 0, sizeof (submitInfo));
+//    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+//    submitInfo.commandBufferCount = 1;
+//    submitInfo.pCommandBuffers = &cmdbuf;
+//    VkPipelineStageFlags psf = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+//    submitInfo.pWaitDstStageMask = &psf;
+//    VkFence fence;
+//    memset(&fence, 0, sizeof (fence));
+//    auto err = m_dev_func->vkQueueSubmit(queue, 1, &submitInfo, fence);
     m_window->frameReady();
     m_window->requestUpdate();
 }
@@ -111,6 +123,11 @@ void QVulkanRenderer::releaseResources()
     ImGui_ImplVulkanH_DestroyQWindow(device, wd_, NULL);
 
     emit dynamic_cast<VulkanWindow*>(m_window)->sig_window_release();
+}
+
+void QVulkanRenderer::logicalDeviceLost()
+{
+
 }
 
 void QVulkanRenderer::on_mouse_pressed_change(QMouseEvent *event)
@@ -284,6 +301,7 @@ void QVulkanRenderer::init()
 //    io.Fonts->Build();
 
     // after imgui init
+
     emit dynamic_cast<VulkanWindow*>(m_window)->sig_window_init_ready();
 }
 
@@ -440,6 +458,12 @@ void QVulkanRenderer::update_cursor_shape(const ImGuiIO &io)
 #endif
 }
 
+void QVulkanRenderer::test()
+{
+    auto device = m_window->device();
+    auto err = m_dev_func->vkDeviceWaitIdle(device);
+}
+
 QVulkanWindowRenderer *VulkanWindow::createRenderer()
 {
     if(render_)
@@ -456,7 +480,8 @@ bool VulkanWindow::event(QEvent *e)
     auto type = e->type();
     auto res = QVulkanWindow::event(e);
     emit sig_window_event(e);
-
+    e->ignore();
+    if(!render_) return res;
     auto rd = dynamic_cast<QVulkanRenderer*>(render_);
     switch (e->type()) {
     default:
@@ -489,6 +514,12 @@ VkDescriptorPool VulkanWindow::descript_pool() const
     auto rd = dynamic_cast<QVulkanRenderer*>(render_);
     if(rd) return rd->vk_descript_pool_;
     return VK_NULL_HANDLE;
+}
+
+void VulkanWindow::test()
+{
+    auto rd = dynamic_cast<QVulkanRenderer*>(render_);
+    rd->test();
 }
 
 ImGuiVulkanWidget::ImGuiVulkanWidget(VulkanWindow *w, QWidget *parent)
