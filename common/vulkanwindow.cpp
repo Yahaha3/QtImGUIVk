@@ -95,18 +95,6 @@ void QVulkanRenderer::startNextFrame()
     } else {
         update();
     }
-//    auto cmdbuf = m_window->currentCommandBuffer();
-//    auto queue = m_window->graphicsQueue();
-//    VkSubmitInfo submitInfo;
-//    memset(&submitInfo, 0, sizeof (submitInfo));
-//    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-//    submitInfo.commandBufferCount = 1;
-//    submitInfo.pCommandBuffers = &cmdbuf;
-//    VkPipelineStageFlags psf = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-//    submitInfo.pWaitDstStageMask = &psf;
-//    VkFence fence;
-//    memset(&fence, 0, sizeof (fence));
-//    auto err = m_dev_func->vkQueueSubmit(queue, 1, &submitInfo, fence);
     m_window->frameReady();
     m_window->requestUpdate();
 }
@@ -271,7 +259,6 @@ void QVulkanRenderer::init()
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-    (void)io;
 
     ImGui::StyleColorsDark();
     // platform init
@@ -295,10 +282,10 @@ void QVulkanRenderer::init()
     io.Fonts->AddFontFromFileTTF("D:/github/QtImGUIVk/3rdparty/font/simhei.ttf", 13, NULL, io.Fonts->GetGlyphRangesDefault());
     {
         ImGui_ImplVulkan_CreateFontsTexture(cmdbuf);
-        ImGui_ImplVulkan_DestroyFontUploadObjects();
+//        ImGui_ImplVulkan_DestroyFontUploadObjects();
+        // 显卡驱动更新后这里destroy会导致vulkan device lost
+        // 显卡驱动版本 528.49
     }
-//    io.Fonts->AddFontFromFileTTF("D:/github/QtImGUIVk/3rdparty/font/simhei.ttf", 13, NULL, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
-//    io.Fonts->Build();
 
     // after imgui init
 
@@ -317,7 +304,7 @@ void QVulkanRenderer::update()
     ImGui::NewFrame();
     // notice other window or widget to draw imgui
     emit window->sig_readypaint();
-    // Rendering
+//     Rendering
     ImGui::Render();
     ImDrawData* draw_data = ImGui::GetDrawData();
     const bool is_minimized = (draw_data->DisplaySize.x <= 0.0f || draw_data->DisplaySize.y <= 0.0f);
@@ -462,6 +449,7 @@ void QVulkanRenderer::test()
 {
     auto device = m_window->device();
     auto err = m_dev_func->vkDeviceWaitIdle(device);
+    qDebug() << "vk err: " << err;
 }
 
 QVulkanWindowRenderer *VulkanWindow::createRenderer()

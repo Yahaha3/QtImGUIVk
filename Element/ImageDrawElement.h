@@ -13,12 +13,13 @@ public:
     void paint() override;
 
     void load_image(const QByteArray& raw);
+    void update_image(uchar* raw, int width, int height);
     void set_geometry(const clz::GeoRect& rect);
     void set_geometry(const clz::GeoPos& position,const QSize& size,
                       const QPoint anchor = QPoint(),
                       const float& angle = 0);
     void set_geometry(const clz::GeoPos& position, const float& angle);
-
+    ImTextureID get_image_texture_id();
 private:
     void calculate_geometry();
     void element_projection() override;

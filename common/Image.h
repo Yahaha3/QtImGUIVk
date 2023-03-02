@@ -4,6 +4,8 @@
 #include <imgui.h>
 #include <iostream>
 #include "backends/imgui_impl_vulkan.h"
+#include <QByteArray>
+#include <QImage>
 
 struct ImageVk
 {
@@ -19,12 +21,10 @@ struct ImageVk
     ImageVk &operator=(const ImageVk &) = delete;
 
     ~ImageVk();
-
-    bool LoadFromBytearry(char* data, int size);
-
     void set_origin_data(std::string data);
 
     bool loadFromOrigin();
+    void updateOrigin(unsigned char* data, int width, int height);
 
     ImTextureID get_image_texture(bool& ok);
 
@@ -32,6 +32,11 @@ struct ImageVk
     int Height;
 
 private:
+    bool LoadFromBytearry(char* data, int size);
+    bool LoadFromBytearry();
+
+private:
     VKuint ID;
-    std::string origin_;
+    std::string m_origin_chr;
+    QImage m_image;
 };

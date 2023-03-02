@@ -35,6 +35,11 @@ INCLUDEPATH += ./3rdparty/imgui
 INCLUDEPATH += ./3rdparty/imgui/backends
 INCLUDEPATH += ./3rdparty/implot
 
+INCLUDEPATH += ./3rdparty/ffmpeg-master-latest-win64-gpl-shared/include
+
+LIBS += -L$$PWD/3rdparty/ffmpeg-master-latest-win64-gpl-shared/lib\
+    -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswresample -lswscale
+
 
 SOURCES += \
     Element/ElementContainer.cpp \
@@ -59,6 +64,7 @@ SOURCES += \
     Map/Projection/ProjectionESG3857.cpp \
     Map/TileManager.cpp \
     MapThread/MapRequestThread.cpp \
+    Video/VideoDecode.cpp \
     common/Image.cpp \
     common/vulkanwindow.cpp \
     vulkanmain.cpp
@@ -94,6 +100,7 @@ HEADERS += \
     Map/Projection/Projection.h \
     Map/Projection/ProjectionESG3857.h \
     MapThread/MapRequestThread.h \
+    Video/VideoDecode.h \
     common/Image.h \
     common/clz_geomap_global.h \
     common/vulkanwindow.h

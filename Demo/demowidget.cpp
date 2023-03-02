@@ -18,6 +18,9 @@ DemoWidget::DemoWidget(VulkanWindow *w, QWidget *parent) :ImGuiVulkanWidget(w, p
 
 //    image_vk = std::make_shared<ImageVk>();
     m_map = std::make_shared<clz::GeoMap>();
+    m_video_decode = std::make_shared<clz::VideoDecode>();
+    connect(m_video_decode.get(), &clz::VideoDecode::sig_video_info_decoded, this, &DemoWidget::slot_video_decode_info);
+    decode_video();
 }
 
 void DemoWidget::paint()
@@ -25,6 +28,7 @@ void DemoWidget::paint()
 //    paint1();
 //    paint2();
     paint_map();
+    paint_video();
 }
 
 void DemoWidget::init_window()
@@ -138,13 +142,15 @@ void DemoWidget::paint_map()
 //    this->window()->test();
     ImGui::SetNextWindowPos({0,0});
     ImGui::SetNextWindowSize(ImVec2(this->size().width(), this->size().height()));
-    ImGui::Begin("Map", 0, ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoTitleBar);
+    ImGui::Begin("Map", 0, ImGuiWindowFlags_NoResize|
+                           ImGuiWindowFlags_NoTitleBar);
     if(debug){
         ImGui::Text("FPS: %.2f Renders: %d", ImGui::GetIO().Framerate, renders);
     }
 
     ImPlotAxisFlags ax_flags = ImPlotAxisFlags_NoLabel | ImPlotAxisFlags_NoTickLabels |
-                               ImPlotAxisFlags_NoGridLines| ImPlotAxisFlags_Foreground;
+                               ImPlotAxisFlags_NoGridLines| ImPlotAxisFlags_Foreground|
+                               ImPlotAxisFlags_NoTickMarks;
     if(ImPlot::BeginPlot("##Map",ImVec2(-1,-1), ImPlotFlags_Equal | ImPlotFlags_NoMouseText)){
         ImPlot::SetupAxes(NULL,NULL,ax_flags,ax_flags|ImPlotAxisFlags_Invert);
         ImPlot::SetupAxesLimits(0,1,0,1);
@@ -158,5 +164,33 @@ void DemoWidget::paint_map()
 //    ImPlot::ShowDemoWindow();
 //    ImGui::ShowDemoWindow();
     ImGui::End();
+}
+#include "Element/ImageDrawElement.h"
+void DemoWidget::paint_video()
+{
+    ImGui::Begin("#Video", 0);
+    ImGui::SetWindowSize({600, 400});
+    if(!m_video){
+        m_video = new clz::ImageDrawElement();
+    }
+    auto ID = m_video->get_image_texture_id();
+    if(ID){
+        ImGui::Image(ID, {1920, 1028});
+    }
+    ImGui::End();
+}
+
+void DemoWidget::decode_video()
+{
+    m_video_decode->set_video_file("D:/TEST/videotest.mp4");
+    m_video_decode->ffmpeg_init();
+    m_video_decode->start();
+}
+
+void DemoWidget::slot_video_decode_info(uchar* data, int w, int h)
+{
+    if(m_video){
+        m_video->update_image(data, w, h);
+    }
 }
 

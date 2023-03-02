@@ -19,9 +19,8 @@ void clz::ImageDrawElement::paint()
 {
     if(!get_map()) return;
 
-    bool ok = false;
-    auto ID = m_image.get_image_texture(ok);
-    if(!ok) return;
+    auto ID = get_image_texture_id();
+    if(!ID) return;
     // 1,直接给定矩形位置绘制
     // 2,给定指定位置和方向,长宽等,自行计算矩形并旋转后得到对应位置
     ImPlot::PlotImageQuad(clz::empty.toStdString().data(), ID, mbmin, mbmax, m_image_angle);
@@ -31,6 +30,11 @@ void clz::ImageDrawElement::load_image(const QByteArray &raw)
 {
     m_image.set_origin_data(raw.toStdString());
     m_image.loadFromOrigin();
+}
+
+void clz::ImageDrawElement::update_image(uchar *raw, int width, int height)
+{
+    m_image.updateOrigin(raw, width, height);
 }
 
 void clz::ImageDrawElement::set_geometry(const clz::GeoRect &rect)
@@ -55,6 +59,14 @@ void clz::ImageDrawElement::set_geometry(const clz::GeoPos &position, const floa
     m_image_angle = angle;
     set_center(position);
     calculate_geometry();
+}
+
+ImTextureID clz::ImageDrawElement::get_image_texture_id()
+{
+    bool ok = false;
+    auto ID = m_image.get_image_texture(ok);
+    if(!ok) return nullptr;
+    return ID;
 }
 
 void clz::ImageDrawElement::calculate_geometry()
