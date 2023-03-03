@@ -1,6 +1,6 @@
 QT -= gui
 
-QT += widgets core network
+QT += widgets core network websockets
 
 CONFIG += c++17
 CONFIG -= app_bundle
@@ -18,7 +18,16 @@ DEFINES += DRAW_IMGUI_DEMO
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+include($$_PRO_FILE_PWD_/projects/app-install-to-sdk.pri)
 include(projects/imgui.pri)
+
+include($$(AOS_KERNEL_ROOT)/projects/aos-kernel-core.pri)
+include($$(AOS_KERNEL_ROOT)/projects/aos-kernel-conflux.pri)
+include($$(AOS_KERNEL_ROOT)/projects/sharedmemory.pri)
+
+include($$(EQUINOX_ROOT)/projects/eqnx-datahelper.pri)
+include($$(EQUINOX_ROOT)/projects/eqnx-cflx-database.pri)
+include($$(EQUINOX_ROOT)/projects/equinox-common.pri)
 
 win32 {
     INCLUDEPATH += $$(VULKAN_SDK)/Include
@@ -63,7 +72,11 @@ SOURCES += \
     Map/Projection/Projection.cpp \
     Map/Projection/ProjectionESG3857.cpp \
     Map/TileManager.cpp \
+    MapSupport/ClzMapSupport.cpp \
     MapThread/MapRequestThread.cpp \
+    Operator/OperatorBase.cpp \
+    Operator/OperatorContainer.cpp \
+    Operator/OperatorMark.cpp \
     Video/VideoDecode.cpp \
     common/Image.cpp \
     common/vulkanwindow.cpp \
@@ -99,8 +112,14 @@ HEADERS += \
     Map/map_include.h \
     Map/Projection/Projection.h \
     Map/Projection/ProjectionESG3857.h \
+    MapSupport/ClzMapSupport.h \
     MapThread/MapRequestThread.h \
+    Operator/OperatorBase.h \
+    Operator/OperatorContainer.h \
+    Operator/OperatorMark.h \
     Video/VideoDecode.h \
     common/Image.h \
     common/clz_geomap_global.h \
     common/vulkanwindow.h
+
+#copyApp(clzGUI-Qt)

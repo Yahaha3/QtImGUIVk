@@ -20,6 +20,8 @@ void check_ffmpeg_error(int result, size_t size){
 
 clz::VideoDecode::VideoDecode(QObject *parent) : QThread(parent)
 {
+    m_owidth = 800;
+    m_oheight = 600;
     std::cout << "ffmpeg----version:" << avcodec_version() << std::endl;
 }
 
@@ -36,12 +38,13 @@ void clz::VideoDecode::run()
             if(ret < 0) break;
 
             sws_scale(m_sws_context, (const unsigned char* const*)m_frame_in->data, m_frame_in->linesize,
-                      0, m_avcodec_context->height, m_frame_rgb->data, m_frame_rgb->linesize);
-            auto output = (unsigned char*)m_outbuffer;
+                      0,
+                      m_avcodec_context->height,
+                      m_frame_rgb->data, m_frame_rgb->linesize);
 //            QImage image(output, m_avcodec_context->width, m_avcodec_context->height, QImage::Format_RGB32);
 //            image.save(QString("D:/TEST/video%1.png").arg(count), "PNG", 100);
-            emit sig_video_info_decoded(output, m_avcodec_context->width, m_avcodec_context->height);
-            msleep(10);
+            emit sig_video_info_decoded((unsigned char*)m_outbuffer, m_owidth, m_oheight);
+            msleep(17);
         }
         av_packet_unref(m_av_packet);
     }
@@ -56,7 +59,6 @@ void clz::VideoDecode::ffmpeg_init()
 {
 //    avformat_network_init();
 
-//    const char* name = "videotest.mp4";
     m_avformat_context = avformat_alloc_context();
     {
         // 1, open video
@@ -110,7 +112,7 @@ void clz::VideoDecode::ffmpeg_init()
     // 6, print dump infomation when exit
     av_dump_format(m_avformat_context, 0, m_video_path.toStdString().c_str(), 0);
 
-
+    AVPixelFormat format = AV_PIX_FMT_BGR32;
     {
         // 7, do decode pre
         m_av_packet = av_packet_alloc();
@@ -118,21 +120,16 @@ void clz::VideoDecode::ffmpeg_init()
         m_frame_rgb = av_frame_alloc();
         // 初始化缓冲区
         m_outbuffer = (uint8_t*)av_malloc(av_image_get_buffer_size(
-                                                   AV_PIX_FMT_RGB32,
-                                                   m_avcodec_context->width,
-                                                   m_avcodec_context->height,
-                                                   1));
-        av_image_fill_arrays(m_frame_rgb->data, m_frame_rgb->linesize, m_outbuffer, AV_PIX_FMT_RGB32,
-                             m_avcodec_context->width,m_avcodec_context->height,1);
+                                          format,m_owidth, m_oheight,1));
+        av_image_fill_arrays(m_frame_rgb->data, m_frame_rgb->linesize,
+                             m_outbuffer, format, 800, 600, 1);
 
         // 转码初始化
-//        m_sws_context = sws_alloc_context();
         m_sws_context = sws_getContext(m_avcodec_context->width,
                                         m_avcodec_context->height,
                                         m_avcodec_context->pix_fmt,
-                                        m_avcodec_context->width,
-                                        m_avcodec_context->height,
-                                        AV_PIX_FMT_RGB32, SWS_BICUBIC, NULL, NULL, NULL);
+                                        m_owidth, m_oheight,
+                                        format, SWS_BICUBIC, NULL, NULL, NULL);
 
     }
 }

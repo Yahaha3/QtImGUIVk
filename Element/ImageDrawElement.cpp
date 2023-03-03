@@ -23,6 +23,7 @@ void clz::ImageDrawElement::paint()
     if(!ID) return;
     // 1,直接给定矩形位置绘制
     // 2,给定指定位置和方向,长宽等,自行计算矩形并旋转后得到对应位置
+    calculate_geometry();
     ImPlot::PlotImageQuad(clz::empty.toStdString().data(), ID, mbmin, mbmax, m_image_angle);
 }
 
@@ -42,7 +43,7 @@ void clz::ImageDrawElement::set_geometry(const clz::GeoRect &rect)
     m_geometry_type = GeometryType::ByRect;
     if(m_geo_rect == rect) return;
     m_geo_rect = rect;
-    calculate_geometry();
+//    calculate_geometry();
 }
 
 void clz::ImageDrawElement::set_geometry(const clz::GeoPos &position, const QSize &size, const QPoint anchor, const float &angle)
@@ -58,7 +59,7 @@ void clz::ImageDrawElement::set_geometry(const clz::GeoPos &position, const floa
 {
     m_image_angle = angle;
     set_center(position);
-    calculate_geometry();
+//    calculate_geometry();
 }
 
 ImTextureID clz::ImageDrawElement::get_image_texture_id()
@@ -67,6 +68,16 @@ ImTextureID clz::ImageDrawElement::get_image_texture_id()
     auto ID = m_image.get_image_texture(ok);
     if(!ok) return nullptr;
     return ID;
+}
+
+int clz::ImageDrawElement::width() const
+{
+    return m_image.Width;
+}
+
+int clz::ImageDrawElement::height() const
+{
+    return m_image.Height;
 }
 
 void clz::ImageDrawElement::calculate_geometry()

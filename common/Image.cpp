@@ -48,7 +48,7 @@ void ImageVk::updateOrigin(unsigned char *data, int width, int height)
     if(width != Width || height != Height){
         Width = width;
         Height = height;
-        ID = ImGui_ImplVulkan_CreateTexture(data, 1920, 1028);
+        ID = ImGui_ImplVulkan_CreateTexture(data, Width, Height);
     } else {
         ImGui_ImplVulkan_UpdateTexture(ID, data);
     }

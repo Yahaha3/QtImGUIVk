@@ -9,6 +9,11 @@
 #include "Map/GeoMap.h"
 #include "backends/imgui_impl_vulkan.h"
 #include "GeoFunction/GeoFunctionUtility.h"
+#include "MapSupport/ClzMapSupport.h"
+
+#include "socket_function_include.h"
+#include "DatabaseCflx/db_cflx_include.h"
+#include "AosKernelCommon.h"
 
 //using namespace ImGui;
 
@@ -20,7 +25,11 @@ DemoWidget::DemoWidget(VulkanWindow *w, QWidget *parent) :ImGuiVulkanWidget(w, p
     m_map = std::make_shared<clz::GeoMap>();
     m_video_decode = std::make_shared<clz::VideoDecode>();
     connect(m_video_decode.get(), &clz::VideoDecode::sig_video_info_decoded, this, &DemoWidget::slot_video_decode_info);
-    decode_video();
+
+    m_cms = std::make_shared<clz::ClzMapSupport>();
+    //    decode_video();
+    kernel_init();
+    m_cms->map_init("Vulkan SoloQ", m_map.get());
 }
 
 void DemoWidget::paint()
@@ -28,7 +37,7 @@ void DemoWidget::paint()
 //    paint1();
 //    paint2();
     paint_map();
-    paint_video();
+//    paint_video();
 }
 
 void DemoWidget::init_window()
@@ -55,6 +64,7 @@ void DemoWidget::vulkan_window_ready()
 
 void DemoWidget::paint1()
 {
+    bool open = false;
     ImGui::Begin(u8"你好!");
 
 //    ImGui::StyleColorsLight();
@@ -62,12 +72,12 @@ void DemoWidget::paint1()
     ImGui::Text("This is some useful text.");
 //    ImGui::SameLine();
 //    ImGui::Indent();
-    ImGui::Checkbox("Color Widget", &_open);
+    ImGui::Checkbox("Color Widget", &open);
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
-    if(_open)
+    if(open)
     {
-        ImGui::Begin("Color Select", &_open);
+        ImGui::Begin("Color Select", &open);
         ImGui::Text("Color Select!!!");
         ImGui::ColorPicker4("clear color", (float*)&_bcolor);
         set_clear_color(_bcolor);
@@ -95,7 +105,8 @@ void DemoWidget::paint1()
 
 void DemoWidget::paint2()
 {
-    ImGui::Begin("First Tool", &_open, ImGuiWindowFlags_MenuBar);
+    bool open = false;
+    ImGui::Begin("First Tool", &open, ImGuiWindowFlags_MenuBar);
     if(ImGui::BeginMenuBar()){
         if(ImGui::BeginMenu("File")){
             if(ImGui::MenuItem("Open...", "Ctrl+O")){
@@ -106,7 +117,7 @@ void DemoWidget::paint2()
             }
             if(ImGui::MenuItem("Close...", "Ctrl+W")){
                 log = "do close";
-                _open = false;
+                open = false;
             }
             ImGui::EndMenu();
         }
@@ -154,10 +165,10 @@ void DemoWidget::paint_map()
     if(ImPlot::BeginPlot("##Map",ImVec2(-1,-1), ImPlotFlags_Equal | ImPlotFlags_NoMouseText)){
         ImPlot::SetupAxes(NULL,NULL,ax_flags,ax_flags|ImPlotAxisFlags_Invert);
         ImPlot::SetupAxesLimits(0,1,0,1);
-        m_map->update_tiles();
+        m_map->map_timeout();
         ImPlot::PushPlotClipRect();
         m_map->test();
-        m_map->update_items();
+//        m_map->update_items();
         ImPlot::PopPlotClipRect();
         ImPlot::EndPlot();
     }
@@ -169,22 +180,39 @@ void DemoWidget::paint_map()
 void DemoWidget::paint_video()
 {
     ImGui::Begin("#Video", 0);
-    ImGui::SetWindowSize({600, 400});
+    ImGui::SetWindowSize({800, 600});
     if(!m_video){
         m_video = new clz::ImageDrawElement();
     }
     auto ID = m_video->get_image_texture_id();
     if(ID){
-        ImGui::Image(ID, {1920, 1028});
+        ImGui::Image(ID, {(float)m_video->width(), (float)m_video->height()});
     }
     ImGui::End();
 }
 
 void DemoWidget::decode_video()
 {
-    m_video_decode->set_video_file("D:/TEST/videotest.mp4");
+    m_video_decode->set_video_file("D:/TEST/20230201_164749.mp4");
     m_video_decode->ffmpeg_init();
     m_video_decode->start();
+}
+
+void DemoWidget::kernel_init()
+{
+    DataTransmissior::handle()->set_share_mem_use(false);
+    auto res = DataTransmissior::handle()->init(eqnx::other::cflx_channel);
+    QString data = TransmissiorUnInited;
+    while(data == TransmissiorDisConnected || data == TransmissiorUnInited){
+        data = DataTransmissior::handle()->read_data(eqnx::other::server_name);
+    }
+
+    ConfluxHelper::instance()->init(aos::AosKernelCommon::string_to_json_object(data));
+
+//    connect(DataTransmissior::handle(), &DataTransmissior::sig_mem_changed, this, &AppWnd::slot_update_share_mem);
+
+    auto inst = eqnx_dh::InstanceContainer::handle();
+    inst->check_environmental();
 }
 
 void DemoWidget::slot_video_decode_info(uchar* data, int w, int h)

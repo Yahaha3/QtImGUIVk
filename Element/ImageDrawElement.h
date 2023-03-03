@@ -20,6 +20,8 @@ public:
                       const float& angle = 0);
     void set_geometry(const clz::GeoPos& position, const float& angle);
     ImTextureID get_image_texture_id();
+    int width() const;
+    int height() const;
 private:
     void calculate_geometry();
     void element_projection() override;

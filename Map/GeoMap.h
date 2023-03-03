@@ -13,6 +13,7 @@ namespace clz {
 
 class MapItem;
 class GraphicsElement;
+class OperatorContainer;
 
 #define TILE_SIZE    256
 
@@ -33,6 +34,7 @@ public:
 
     // 瓦片请求
     std::shared_ptr<MapRequestThread> get_request_thread() const;
+    std::shared_ptr<OperatorContainer> map_oc() const;
     // 当前缩放层级
     int current_zoom() const;
 
@@ -43,8 +45,7 @@ public:
     void test();
 
     // 地图更新
-    void update_tiles();
-    void update_items();
+    void map_timeout();
 
     //对象
     std::shared_ptr<TileManager> get_tile_manager() const;
@@ -55,6 +56,11 @@ private:
 
     // 初始化用到的items
     void init_map_items();
+
+    // 瓦片更新
+    void tiles_update();
+    // 组件更新
+    void items_update();
 
 private:
     // 当前可视区域瓦片集合
@@ -79,6 +85,9 @@ private:
 
     // 与地图绑定的根节点
     std::shared_ptr<GraphicsElement> m_root_item;
+
+    // 地图呈现对象容器
+    std::shared_ptr<OperatorContainer> m_op_container;
 };
 
 }

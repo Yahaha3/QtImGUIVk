@@ -1,6 +1,11 @@
 #include "GeoFunctionUtility.h"
 #include <qmath.h>
 #include "Map/Projection/Projection.h"
+#include <QFile>
+
+//所有内核相关的业务都放这里来转吧
+
+#include "AosKernelCommon.h"
 
 #define PI 3.14159265359
 
@@ -135,4 +140,22 @@ QPointF clz::GeoFunctionUtility::get_polyline_center(QVector<QPointF> vertices)
         }
     }
     return QPointF(tx / vertices.size(), ty/ vertices.size());
+}
+
+QByteArray clz::GeoFunctionUtility::get_image_bytearray(const QString &path, bool &ok)
+{
+    ok = false;
+    if(!QFile::exists(path)) return QByteArray();
+    QFile file(path);
+    if(file.open(QFile::ReadOnly)){
+        ok = true;
+        auto data = file.readAll();
+        return data;
+    }
+    return QByteArray();
+}
+
+QString clz::GeoFunctionUtility::kernel_apps_dir()
+{
+    return aos::AosKernelCommon::get_apps_dir();
 }

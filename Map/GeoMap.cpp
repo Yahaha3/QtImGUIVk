@@ -5,6 +5,7 @@
 #include "GeoFunction/GeoFunctionUtility.h"
 #include "map_include.h"
 #include "Element/element_include.h"
+#include "Operator/OperatorContainer.h"
 #include <QList>
 
 using namespace clz;
@@ -32,10 +33,12 @@ GeoMap::GeoMap()
     m_backend = std::make_shared<GeoBackendGaode>();
     m_root_item = std::make_shared<RootElement>(this);
     m_tile_manager = std::make_shared<TileManager>(this);
+    m_op_container = std::make_shared<OperatorContainer>();
     set_map_projection(new ProjectionESG3857());
     init_map_items();
 
     m_root_item->set_item_id(clz::root_item);
+    m_op_container->set_map(this);
 }
 
 const QVector<QPair<TilePos, std::shared_ptr<Tile> > > &GeoMap::get_region(ImPlotRect view, ImVec2 pixels)
@@ -85,6 +88,11 @@ std::shared_ptr<MapRequestThread> GeoMap::get_request_thread() const
     return m_request_thread;
 }
 
+std::shared_ptr<OperatorContainer> GeoMap::map_oc() const
+{
+    return m_op_container;
+}
+
 int GeoMap::current_zoom() const
 {
     return m_zoom;
@@ -118,61 +126,31 @@ void GeoMap::test()
 //    }
 //    line->paint();
 
-    static clz::ImageDrawElement* image = nullptr;
-    if(!image){
-        image = new ImageDrawElement();
-        auto path = QCoreApplication::applicationDirPath() + "/plane.png";
-        QFile file(path);
-        if (file.open(QFile::ReadOnly))
-        {
-            auto data = file.readAll();
-            image->load_image(data);
-            image->set_flag(IgnoreScale);
-            image->set_geometry(GeoPos(30,103), QSize(40, 40), QPoint(), 0);
-        }
-    }
-    static float angle = 0;
-    image->set_geometry(GeoPos(30,103), angle);
-    angle += 0.01;
-//    image->refresh();
-    image->paint();
+//    static clz::ImageDrawElement* image = nullptr;
+//    if(!image){
+//        image = new ImageDrawElement();
+//        auto path = QCoreApplication::applicationDirPath() + "/plane.png";
+//        QFile file(path);
+//        if (file.open(QFile::ReadOnly))
+//        {
+//            auto data = file.readAll();
+//            image->load_image(data);
+//            image->set_flag(IgnoreScale);
+//            image->set_geometry(GeoPos(30,103), QSize(40, 40), QPoint(), 0);
+//        }
+//    }
+//    static float angle = 0;
+//    image->set_geometry(GeoPos(30,103), angle);
+//    angle += 0.01;
+////    image->refresh();
+//    image->paint();
 }
 
-void GeoMap::update_tiles()
+void GeoMap::map_timeout()
 {
-    static bool debug = false;
-    if(ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_A))){
-        debug = !debug;
-    }
-
-    auto size = ImPlot::GetPlotSize();
-    auto limits = ImPlot::GetPlotLimits();
-    auto region = get_region(limits, size);
-    for(auto& pair: region){
-        auto position = pair.first;
-        auto tile     = pair.second;
-        auto [bmin, bmax] = position.bounds();
-        if(tile){
-            auto col = debug ? ((position.x % 2 == 0 && position.y % 2 != 0) ||
-                                (position.x % 2 != 0 && position.y %2 == 0)) ?
-                       ImVec4(1,0,1,1) : ImVec4(1,1,0,1) : ImVec4(1,1,1,1);
-            bool ok = false;
-            auto ID = get_tile_manager()->get_tile_texture_id(position, ok);
-            if(ok){
-                ImPlot::PlotImage("##Tiles", ID, bmin, bmax, {0,0}, {1,1}, col);
-                if (debug)
-                    ImPlot::PlotText(position.tozxy().toStdString().c_str(),(bmin.x+bmax.x)/2,(bmin.y+bmax.y)/2);
-            }
-        }
-    }
-
-}
-
-void GeoMap::update_items()
-{
-    for(auto item: m_map_items){
-        item->paint();
-    }
+    tiles_update();
+    items_update();
+    map_oc()->operators_update();
 }
 
 std::shared_ptr<TileManager> GeoMap::get_tile_manager() const
@@ -232,4 +210,40 @@ void GeoMap::init_map_items()
     m_map_items.append(label);
     m_map_items.append(scale);
     m_map_items.append(copyright);
+}
+
+void GeoMap::tiles_update()
+{
+    static bool debug = false;
+    if(ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_A))){
+        debug = !debug;
+    }
+
+    auto size = ImPlot::GetPlotSize();
+    auto limits = ImPlot::GetPlotLimits();
+    auto region = get_region(limits, size);
+    for(auto& pair: region){
+        auto position = pair.first;
+        auto tile     = pair.second;
+        auto [bmin, bmax] = position.bounds();
+        if(tile){
+            auto col = debug ? ((position.x % 2 == 0 && position.y % 2 != 0) ||
+                                (position.x % 2 != 0 && position.y %2 == 0)) ?
+                       ImVec4(1,0,1,1) : ImVec4(1,1,0,1) : ImVec4(1,1,1,1);
+            bool ok = false;
+            auto ID = get_tile_manager()->get_tile_texture_id(position, ok);
+            if(ok){
+                ImPlot::PlotImage("##Tiles", ID, bmin, bmax, {0,0}, {1,1}, col);
+                if (debug)
+                    ImPlot::PlotText(position.tozxy().toStdString().c_str(),(bmin.x+bmax.x)/2,(bmin.y+bmax.y)/2);
+            }
+        }
+    }
+}
+
+void GeoMap::items_update()
+{
+    for(auto item: m_map_items){
+        item->paint();
+    }
 }

@@ -33,6 +33,12 @@ public:
 
     static QPointF get_polygon_center(QVector<QPointF> vertices);
     static QPointF get_polyline_center(QVector<QPointF> vertices);
+
+    // 文件操作
+    static QByteArray get_image_bytearray(const QString& path, bool& ok);
+
+    // 内核工具
+    static QString kernel_apps_dir();
 };
 }
 

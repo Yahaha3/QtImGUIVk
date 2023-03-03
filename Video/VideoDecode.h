@@ -45,6 +45,8 @@ private:
     AVFrame* m_frame_rgb;
     // 缓冲区
     uint8_t* m_outbuffer;
+    // 输出尺寸
+    int m_owidth, m_oheight;
 };
 
 }
