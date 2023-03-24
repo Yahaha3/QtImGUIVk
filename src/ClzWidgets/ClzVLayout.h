@@ -10,6 +10,9 @@ public:
     ClzVLayout(ClzLayout* parent = 0);
 
     void relayout() override;
+    
+private:
+    const int m_bar_height = 15;
 };
 }
 

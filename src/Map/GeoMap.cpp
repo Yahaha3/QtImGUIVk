@@ -34,6 +34,7 @@ GeoMap::GeoMap()
     m_root_item = std::make_shared<RootElement>(this);
     m_tile_manager = std::make_shared<TileManager>(this);
     m_op_container = std::make_shared<OperatorContainer>();
+
     set_map_projection(new ProjectionESG3857());
     init_map_items();
 
@@ -114,36 +115,27 @@ ImPlotPoint GeoMap::geopos2implot(GeoPos pt)
     return plot_pos;
 }
 #include <QCoreApplication>
-
+#include <QJsonArray>
+#include <QJsonObject>
+#include "ClzWidgets/ClzCardWidget.h"
 void GeoMap::test()
 {
-//    static clz::LinestringDrawElement* line = nullptr;
-//    if(!line){
-//        QVector<clz::GeoPos> vertices;
-//        vertices.append(clz::GeoPos(30, 60));
-//        vertices.append(clz::GeoPos(30, 120));
-//        line = new clz::LinestringDrawElement(vertices);
-//    }
-//    line->paint();
+    static clz::ClzCardWidget* card = nullptr;
+    if(!card){
+        card = new clz::ClzCardWidget();
+        card->set_widget_name("test");
+        QStringList contexts = {"Context1"};
+        QStringList uris = {"Context/context"};
+        QJsonArray options = {QJsonObject()};
+        card->init_card(contexts, uris, options);
 
-//    static clz::ImageDrawElement* image = nullptr;
-//    if(!image){
-//        image = new ImageDrawElement();
-//        auto path = QCoreApplication::applicationDirPath() + "/plane.png";
-//        QFile file(path);
-//        if (file.open(QFile::ReadOnly))
-//        {
-//            auto data = file.readAll();
-//            image->load_image(data);
-//            image->set_flag(IgnoreScale);
-//            image->set_geometry(GeoPos(30,103), QSize(40, 40), QPoint(), 0);
-//        }
-//    }
-//    static float angle = 0;
-//    image->set_geometry(GeoPos(30,103), angle);
-//    angle += 0.01;
-////    image->refresh();
-//    image->paint();
+        card->move(QPoint(50,50));
+        card->resize(QSize(300,300));
+    }
+    static int count = -1;
+    count ++;
+    card->update_card("Context/context", count);
+    card->paint();
 }
 
 void GeoMap::map_timeout()
@@ -156,6 +148,11 @@ void GeoMap::map_timeout()
 std::shared_ptr<TileManager> GeoMap::get_tile_manager() const
 {
     return m_tile_manager;
+}
+
+void GeoMap::sub_items_init()
+{
+    get_request_thread()->start();
 }
 
 bool GeoMap::append_region(int z, double min_x, double min_y, double size_x, double size_y)

@@ -169,3 +169,10 @@ clz::GeoPos clz::GeoFunctionUtility::get_target_lonlat_with_distance(const clz::
                                        target_lon, target_lat);
     return GeoPos(target_lat, target_lon);
 }
+
+QString clz::GeoFunctionUtility::cpsgr_icon_path(const QString &icon)
+{
+    auto pre = aos::AosKernelCommon::get_installer_dir();
+    auto path = pre + QString("/UX/csgrs/%1_64x64.png").arg(icon);
+    return path;
+}

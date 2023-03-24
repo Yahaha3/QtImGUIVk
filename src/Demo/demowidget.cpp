@@ -11,31 +11,43 @@
 #include "GeoFunction/GeoFunctionUtility.h"
 #include "MapSupport/ClzMapSupport.h"
 #include "MapSupport/CflxSupport.h"
+#include "KernelSupport/KernelSupport.h"
 
 #include "socket_function_include.h"
 #include "DatabaseCflx/db_cflx_include.h"
 #include "AosKernelCommon.h"
 
-//using namespace ImGui;
+#include "ClzWidgets/ClzVLayout.h"
+#include "ClzWidgets/ClzHLayout.h"
+#include "Video/VideoWidget.h"
+#include "ClzWidgets/ClzImageButton.h"
+#include "ClzWidgets/ClzClickableFrame.h"
 
 DemoWidget::DemoWidget(VulkanWindow *w, QWidget *parent) :ImGuiVulkanWidget(w, parent)
 {
     set_clear_color(ImVec4(0.2f, 0.3f, 0.5f, 1));
 
-//    image_vk = std::make_shared<ImageVk>();
     m_map = std::make_shared<clz::GeoMap>();
     m_cms = std::make_shared<clz::ClzMapSupport>();
     m_ccs = std::make_shared<clz::CflxSupport>();
+    m_ks = std::make_shared<KernelSupport>();
+    m_layout_left  = std::make_shared<clz::ClzVLayout>();
+    m_layout_right = std::make_shared<clz::ClzVLayout>();
+
+    m_layout_top_menu_entity_status = std::make_shared<clz::ClzHLayout>();
+    m_layout_top_menu_system_status = std::make_shared<clz::ClzHLayout>();
+    m_layout_bottom_function = std::make_shared<clz::ClzHLayout>();
+
+    m_hero_card = std::make_shared<clz::ClzClickableFrame>();
+    m_hero_card->set_widget_name("hero");
     m_cms->map_init("Vulkan SoloQ", m_map.get());
     m_ccs->map_init(m_map.get());
 
-//    kernel_init();
+    kernel_init();
 }
 
 void DemoWidget::paint()
 {
-//    paint1();
-//    paint2();
     paint_map();
 }
 
@@ -43,6 +55,11 @@ void DemoWidget::init_window()
 {
     ImPlot::CreateContext();
     ImPlot::StyleColorsDark();
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.WindowPadding = ImVec2(0,0);
+    style.FramePadding = ImVec2(0,0);
+    style.FrameBorderSize = 0;
+    style.WindowBorderSize = 1.0f;
 }
 
 void DemoWidget::release_window()
@@ -52,95 +69,13 @@ void DemoWidget::release_window()
 
 void DemoWidget::vulkan_window_ready()
 {
-//    auto path = QCoreApplication::applicationDirPath() + "/image.png";
-//    QFile file(path);
-//    if (file.open(QFile::ReadOnly))
-//    {
-//        auto array = file.readAll();
-//        image_vk->LoadFromBytearry(array.data(), array.size());
-//    }
-}
-
-void DemoWidget::paint1()
-{
-    bool open = false;
-    ImGui::Begin(u8"你好!");
-
-//    ImGui::StyleColorsLight();
-
-    ImGui::Text("This is some useful text.");
-//    ImGui::SameLine();
-//    ImGui::Indent();
-    ImGui::Checkbox("Color Widget", &open);
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-
-    if(open)
-    {
-        ImGui::Begin("Color Select", &open);
-        ImGui::Text("Color Select!!!");
-        ImGui::ColorPicker4("clear color", (float*)&_bcolor);
-        set_clear_color(_bcolor);
-        ImGui::End();
-    }
-
-    ImGui::Separator();
-    if(ImGui::BeginTabBar("##tabs", ImGuiTabBarFlags_None)){
-        auto style = ImGui::GetStyle();
-        if (ImGui::BeginTabItem("Size1"))
-        {
-            ImGui::SliderFloat2("WindowPadding", (float*)&style.WindowPadding, 0.0f, 20.0f, "%.0f");
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Size2"))
-        {
-            ImGui::SliderFloat("WindowBorderSize", &style.WindowBorderSize, 0.0f, 1.0f, "%.0f");
-            ImGui::EndTabItem();
-        }
-        ImGui::EndTabBar();
-    }
-
-    ImGui::End();
-}
-
-void DemoWidget::paint2()
-{
-    bool open = false;
-    ImGui::Begin("First Tool", &open, ImGuiWindowFlags_MenuBar);
-    if(ImGui::BeginMenuBar()){
-        if(ImGui::BeginMenu("File")){
-            if(ImGui::MenuItem("Open...", "Ctrl+O")){
-                log = "do open";
-            }
-            if(ImGui::MenuItem("Save...", "Ctrl+S")){
-                log = "do save";
-            }
-            if(ImGui::MenuItem("Close...", "Ctrl+W")){
-                log = "do close";
-                open = false;
-            }
-            ImGui::EndMenu();
-        }
-        ImGui::EndMenuBar();
-    }
-    ImGui::Text("%s", log.toLatin1().data());
-
-    ImVec4 color;
-    ImGui::ColorEdit4("Color", (float*)&color);
-
-    float samples[100];
-    for(int i = 0; i < 100; i++){
-        double value = i * 0.2f + ImGui::GetTime() *1.5f;
-        samples[i] = sin(value);
-    }
-    ImGui::PlotLines("Samples", samples, 100/*, 50, NULL, 50, 50, ImVec2{300, 50}*/);
-    ImGui::TextColored(ImVec4(1,1,0,1), "Important Stuff");
-    ImGui::BeginChild("Scrolling");
-    for(int i = 0; i < 50; i++){
-        ImGui::Text("%04d: Some text", i);
-    }
-    ImGui::EndChild();
-
-    ImGui::End();
+    // 布局初始化要在ImGui上下文准备完成之后
+    layout_init();
+    m_map->sub_items_init();
+    // ui初始化
+    m_ks->ui_init(m_layout_bottom_function.get(),
+                  m_layout_right.get(),
+                  m_layout_top_menu_entity_status.get());
 }
 
 void DemoWidget::paint_map()
@@ -179,13 +114,14 @@ void DemoWidget::paint_map()
         ImPlot::SetupAxesLimits(0,1,0,1);
         m_map->map_timeout();
         ImPlot::PushPlotClipRect();
-        m_map->test();
+//        m_map->test();
+        layout_update();
+        hero_card_update();
         ImPlot::PopPlotClipRect();
         ImPlot::EndPlot();
     }
     ImGui::End();
 
-//    ImPlot::ShowDemoWindow();
 //    ImGui::ShowDemoWindow();
 }
 
@@ -204,12 +140,96 @@ void DemoWidget::kernel_init()
 
 //    connect(DataTransmissior::handle(), &DataTransmissior::sig_mem_changed, this, &AppWnd::slot_update_share_mem);
 
-    auto inst = eqnx_dh::InstanceContainer::handle();
-    inst->check_environmental();
+    m_ks->init();
 
     // 初始化航线
     {
-//        m_ccs->init_download_mission_phases(ConfluxHelper::instance()->actors().first());
+        m_ccs->init_download_mission_phases(ConfluxHelper::instance()->actors().first());
     }
+}
+
+
+void DemoWidget::layout_init()
+{
+    {
+        auto layout = clz::LayoutAnchor::Left | clz::LayoutAnchor::VCenter;
+        m_layout_left->set_layout_anchor(static_cast<clz::LayoutAnchor>(layout));
+
+        layout = clz::LayoutAnchor::Right | clz::LayoutAnchor::Top;
+        m_layout_right->set_layout_anchor(static_cast<clz::LayoutAnchor>(layout));
+
+        layout = clz::LayoutAnchor::Top | clz::LayoutAnchor::Left;
+        m_layout_top_menu_entity_status->set_layout_anchor(static_cast<clz::LayoutAnchor>(layout));
+
+        layout = clz::LayoutAnchor::Bottom | clz::LayoutAnchor::HCenter;
+        m_layout_bottom_function->set_layout_anchor(static_cast<clz::LayoutAnchor>(layout));
+    }
+
+    const QString side_path = "D:/github/QtImGUIVk/resources/icon/side_bar/black/%1_44x44.png";
+    {
+        // 左侧功能面板初始化, 磁吸/hud/感知域/定位/地图缩/地图放/设置轨迹存续时间/清除轨迹/测距
+        m_layout_left->set_contents_margins(1, 5, 1, 5);
+        m_layout_left->set_sensitive_width_fold(false);
+        auto centered       = new clz::ClzImageButton(side_path.arg("centered"), "centered");
+        auto hud            = new clz::ClzImageButton(side_path.arg("overlay-hud"), "overlay-hud");
+        auto projection     = new clz::ClzImageButton(side_path.arg("projection"), "projection");
+        auto position       = new clz::ClzImageButton(side_path.arg("position"), "position");
+        auto zoom_in        = new clz::ClzImageButton(side_path.arg("zoom-in"), "zoom_in");
+        auto zoom_out       = new clz::ClzImageButton(side_path.arg("zoom-out"), "zoom_out");
+        auto track          = new clz::ClzImageButton(side_path.arg("track"), "track");
+        auto delete_track   = new clz::ClzImageButton(side_path.arg("delete-track"), "delete_track");
+        auto measure        = new clz::ClzImageButton(side_path.arg("measure"), "measure");
+        m_layout_left->add_widget(centered);
+        m_layout_left->add_widget(hud);
+        m_layout_left->add_widget(projection);
+        m_layout_left->add_widget(position);
+        m_layout_left->add_widget(zoom_in);
+        m_layout_left->add_widget(zoom_out);
+        m_layout_left->add_widget(track);
+        m_layout_left->add_widget(delete_track);
+        m_layout_left->add_widget(measure);
+    }
+
+    {
+//        showMaximized();
+    }
+}
+
+void DemoWidget::layout_update()
+{
+    m_layout_left->relayout();
+    m_layout_right->relayout();
+    m_layout_top_menu_entity_status->relayout();
+//    m_layout_top_menu_system_status->relayout();
+    m_layout_bottom_function->relayout();
+}
+#include "KernelSupport/KernelInstanceData.h"
+void DemoWidget::hero_card_update()
+{
+    bool ok = false;
+    auto instance = m_ks->instance_data()->current_instance_data(ok);
+    if(!ok) return;
+    m_hero_card->update_left_info("Auto");
+    m_hero_card->update_right_info(instance.entity_name);
+    m_hero_card->set_background_image(instance.entity_image);
+    m_hero_card->paint();
+}
+
+void DemoWidget::resizeEvent(QResizeEvent *e)
+{
+    auto msize = this->size();
+
+    {
+        m_layout_left->resize_event(msize);
+        m_layout_right->resize_event(msize);
+        m_layout_top_menu_entity_status->resize_event(msize);
+//        m_layout_top_menu_system_status->resize_event(msize);
+        m_layout_bottom_function->resize_event(msize);
+    }
+
+    if(m_hero_card){
+        m_hero_card->move(QPoint(1, msize.height() - m_hero_card->size().height()));
+    }
+    ImGuiVulkanWidget::resizeEvent(e);
 }
 

@@ -14,6 +14,9 @@ void clz::OperatorContainer::set_map(clz::GeoMap *map)
 
 clz::OperatorBase *clz::OperatorContainer::get_operator_mark(const QString &signature)
 {
+    if(m_operators.contains(signature)){
+        return m_operators.value(signature);
+    }
     auto op = new OperatorMark(m_map, signature);
     m_operators.insert(signature, op);
     return op;
@@ -21,6 +24,9 @@ clz::OperatorBase *clz::OperatorContainer::get_operator_mark(const QString &sign
 
 clz::OperatorBase *clz::OperatorContainer::get_operator_linestring(const QString &signature)
 {
+    if(m_operators.contains(signature)){
+        return m_operators.value(signature);
+    }
     auto op = new OperatorLineString(m_map, signature);
     m_operators.insert(signature, op);
     return op;
@@ -131,8 +137,15 @@ void clz::OperatorContainer::set_current_operator(clz::OperatorBase *op)
     m_current_operator = op;
 }
 
+bool clz::OperatorContainer::has_operator(const QString &signature)
+{
+    return m_operators.contains(signature);
+}
+
 void clz::OperatorContainer::operators_update()
 {
+    // 会主动去刷operator对象,element在被operator携带后可自动触发,否则需要手动触发
+    // 有些element也不一定需要被触发
     for(auto op: m_operators){
         op->refresh();
     }

@@ -53,6 +53,17 @@ void clz::ClzObject::remove_child(clz::ClzObject *obj)
     clz::ClzObjectManager::instance().remove_element(obj->get_object_id());
 }
 
+bool clz::ClzObject::has_child(clz::ClzObject *obj)
+{
+    if(!obj) return false;
+    return has_child(obj->get_object_id());
+}
+
+bool clz::ClzObject::has_child(const QString &id)
+{
+    return m_childrens.contains(id);
+}
+
 void clz::ClzObject::delete_elements()
 {
     clz::ClzObjectManager::instance().remove_elements(m_childrens.toList());
@@ -62,6 +73,11 @@ void clz::ClzObject::delete_elements()
 int clz::ClzObject::count_childrens() const
 {
     return m_childrens.count();
+}
+
+QStringList clz::ClzObject::childrens() const
+{
+    return m_childrens.toList();
 }
 
 void clz::ClzObject::set_object_id(QString id)

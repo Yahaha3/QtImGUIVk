@@ -28,6 +28,8 @@ public:
 
     void close();
 
+    void update_decode_size(int w, int h);
+
 signals:
     void sig_video_info_decoded(uchar* data, int w, int h);
 

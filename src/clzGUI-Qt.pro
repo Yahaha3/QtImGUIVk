@@ -1,6 +1,6 @@
 QT -= gui
 
-QT += widgets core network websockets
+QT += widgets core network websockets sql
 
 CONFIG += c++17
 CONFIG -= app_bundle
@@ -13,6 +13,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += CURL_STATICLIB
 DEFINES += DRAW_IMGUI_DEMO
 
+DEFINES += LANGUAGE_EN
 # You can also make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
@@ -53,10 +54,14 @@ LIBS += -L$$PWD/../3rdparty/ffmpeg-master-latest-win64-gpl-shared/lib\
 SOURCES += \
     ClzCore/ClzObject.cpp \
     ClzCore/ClzObjectManager.cpp \
+    ClzWidgets/ClzCardWidget.cpp \
+    ClzWidgets/ClzClickableFrame.cpp \
     ClzWidgets/ClzHLayout.cpp \
+    ClzWidgets/ClzImageButton.cpp \
     ClzWidgets/ClzLayout.cpp \
     ClzWidgets/ClzVLayout.cpp \
     ClzWidgets/ClzWidget.cpp \
+    Database/ClzDataBaseManager.cpp \
     Element/ElementContainer.cpp \
     Element/GraphicsDrawElement.cpp \
     Element/GraphicsElement.cpp \
@@ -67,6 +72,8 @@ SOURCES += \
     GeoFunction/GeoMapGlobal.cpp \
     GeoFunction/LayerBackend/GeoBackendGaode.cpp \
     GeoFunction/LayerBackend/GeoBackendGoogle.cpp \
+    KernelSupport/KernelInstanceData.cpp \
+    KernelSupport/KernelSupport.cpp \
     Map/GeoMap.cpp \
     Demo/demowidget.cpp \
     GeoFunction/LayerBackend/GeoBackend.cpp \
@@ -87,6 +94,7 @@ SOURCES += \
     Operator/OperatorLineString.cpp \
     Operator/OperatorMark.cpp \
     Video/VideoDecode.cpp \
+    Video/VideoStreamPush.cpp \
     Video/VideoWidget.cpp \
     common/Image.cpp \
     common/ManagerTemplate.cpp \
@@ -102,10 +110,15 @@ win32:QMAKE_CXXFLAGS += /bigobj
 HEADERS += \
     ClzCore/ClzObject.h \
     ClzCore/ClzObjectManager.h \
+    ClzWidgets/ClzCardWidget.h \
+    ClzWidgets/ClzClickableFrame.h \
     ClzWidgets/ClzHLayout.h \
+    ClzWidgets/ClzImageButton.h \
     ClzWidgets/ClzLayout.h \
     ClzWidgets/ClzVLayout.h \
     ClzWidgets/ClzWidget.h \
+    Database/ClzDataBaseManager.h \
+    Database/clz_database_common.h \
     Element/ElementContainer.h \
     Element/GraphicsDrawElement.h \
     Element/GraphicsElement.h \
@@ -116,6 +129,8 @@ HEADERS += \
     GeoFunction/GeoFunctionUtility.h \
     GeoFunction/LayerBackend/GeoBackendGaode.h \
     GeoFunction/LayerBackend/GeoBackendGoogle.h \
+    KernelSupport/KernelInstanceData.h \
+    KernelSupport/KernelSupport.h \
     Map/GeoMap.h \
     Demo/demowidget.h \
     GeoFunction/GeoMapGlobal.h \
@@ -138,6 +153,7 @@ HEADERS += \
     Operator/OperatorLineString.h \
     Operator/OperatorMark.h \
     Video/VideoDecode.h \
+    Video/VideoStreamPush.h \
     Video/VideoWidget.h \
     common/Image.h \
     common/ManagerTemplate.h \

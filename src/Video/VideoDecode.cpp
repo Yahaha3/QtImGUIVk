@@ -57,7 +57,7 @@ void clz::VideoDecode::set_video_file(const QString &path)
 
 void clz::VideoDecode::ffmpeg_init()
 {
-//    avformat_network_init();
+    avformat_network_init();
 
     m_avformat_context = avformat_alloc_context();
     {
@@ -122,7 +122,7 @@ void clz::VideoDecode::ffmpeg_init()
         m_outbuffer = (uint8_t*)av_malloc(av_image_get_buffer_size(
                                           format,m_owidth, m_oheight,1));
         av_image_fill_arrays(m_frame_rgb->data, m_frame_rgb->linesize,
-                             m_outbuffer, format, 800, 600, 1);
+                             m_outbuffer, format, m_owidth, m_oheight, 1);
 
         // 转码初始化
         m_sws_context = sws_getContext(m_avcodec_context->width,
@@ -144,4 +144,10 @@ void clz::VideoDecode::close()
     av_packet_free(&m_av_packet);
     avcodec_close(m_avcodec_context);
     avformat_free_context(m_avformat_context);
+}
+
+void clz::VideoDecode::update_decode_size(int w, int h)
+{
+    m_owidth = w;
+    m_oheight = h;
 }

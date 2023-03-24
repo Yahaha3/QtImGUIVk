@@ -35,6 +35,7 @@ public:
 
     OperatorBase* get_current_operator();
     void set_current_operator(OperatorBase* op);
+    bool has_operator(const QString& signature);
 
     // mark中的插值对象需要做额外处理
     void operators_update();

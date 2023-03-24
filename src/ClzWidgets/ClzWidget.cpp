@@ -2,7 +2,11 @@
 
 clz::ClzWidget::ClzWidget(clz::ClzWidget *parent): ClzObject(parent)
 {
+}
 
+ImVec2 clz::ClzWidget::impos()
+{
+    return ImVec2((float)m_position.x(), (float)m_position.y());
 }
 
 QPoint clz::ClzWidget::pos()
@@ -15,14 +19,24 @@ QSize clz::ClzWidget::size()
     return m_size;
 }
 
-QString clz::ClzWidget::title()
+ImVec2 clz::ClzWidget::imsize()
 {
-    return m_title;
+    return ImVec2((float)m_size.width(), (float)m_size.height());
 }
 
-void clz::ClzWidget::set_widget_title(const QString &title)
+QString clz::ClzWidget::name()
 {
-    m_title = title;
+    return m_name;
+}
+
+bool clz::ClzWidget::fold()
+{
+    return m_widget_fold;
+}
+
+void clz::ClzWidget::set_widget_name(const QString &name)
+{
+    m_name = name;
 }
 
 void clz::ClzWidget::move(QPoint position)

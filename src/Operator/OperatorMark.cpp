@@ -123,10 +123,11 @@ qint64 clz::OperatorMark::current_timestamp()
 
 QString clz::OperatorMark::get_mark_icon_path()
 {
-    auto path = clz::GeoFunctionUtility::kernel_apps_dir()
-            + eqnx::other::map_animation_path
-            + icon_template() + eqnx::other::png_suffix;
-    return path;
+    return icon_template();
+//    auto path = clz::GeoFunctionUtility::kernel_apps_dir()
+//            + eqnx::other::map_animation_path
+//            + icon_template() + eqnx::other::png_suffix;
+//    return path;
 }
 
 clz::LinestringDrawElement *clz::OperatorMark::element_trajectory()

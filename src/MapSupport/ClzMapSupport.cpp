@@ -4,6 +4,9 @@
 #include "Map/GeoMap.h"
 #include "Operator/OperatorContainer.h"
 #include "Operator/OperatorMark.h"
+#include "DatabaseCflx/db_cflx_include.h"
+#include "Entity.h"
+#include "Entity/EntityPool.h"
 
 clz::ClzMapSupport::ClzMapSupport(QObject *parent)
 {
@@ -38,11 +41,20 @@ void clz::ClzMapSupport::slot_map_support_mark_insert(const QJsonObject &jo)
     auto position = jo[eqnx::eqco::eqco_start_pos].toArray();
     auto moc = m_map->map_oc();
     if(!moc) return;
-    auto mark = moc->get_operator_mark(idsn);
-    mark->set_icon_template(type);
-    mark->generate_operator(GeoPos(position.at(1).toDouble(), position.at(0).toDouble()), false);
-    auto om = dynamic_cast<OperatorMark*>(mark);
-    if(om){om->enable_interpolation(true);}
+    if(moc->has_operator(idsn)) return;
+    if(ConfluxHelper::instance()->actor_or_null_with_idsn(idsn)){
+        auto esig = ConfluxHelper::instance()->actor_or_null_with_idsn(idsn)->entity_sig();
+        auto entity = aos::EntityPool::instance().get_entity_or_null(esig);
+        if(entity){
+            auto icon = entity->parameters_.map_icon_;
+            auto mark = moc->get_operator_mark(idsn);
+            mark->set_icon_template(icon);
+            mark->generate_operator(GeoPos(position.at(1).toDouble(), position.at(0).toDouble()), false);
+            auto om = dynamic_cast<OperatorMark*>(mark);
+            if(om){om->enable_interpolation(true);}
+            std::cout << "insert mark: " << idsn.toStdString() << std::endl;
+        }
+    }
 }
 
 void clz::ClzMapSupport::slot_map_support_mark_update(const QJsonObject &jo)

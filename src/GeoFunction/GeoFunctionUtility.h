@@ -40,6 +40,11 @@ public:
     // 内核工具
     static QString kernel_apps_dir();
     static GeoPos get_target_lonlat_with_distance(const GeoPos& p0, const GeoPos& p1, double distance);
+    static QString cpsgr_icon_path(const QString& icon);
+
+    // 其他常用工具
+    template <typename TSet, typename TFlag>
+    static inline bool has_flag(TSet set, TFlag flag) { return (set & flag) == flag; }
 };
 }
 

@@ -22,8 +22,11 @@ public:
 
     void add_child(ClzObject* obj);
     void remove_child(ClzObject* obj);
+    bool has_child(ClzObject* obj);
+    bool has_child(const QString& id);
     void delete_elements();
     int count_childrens() const;
+    QStringList childrens() const;
 
     void set_object_id(QString id = clz::empty);
     QString get_object_id() const;

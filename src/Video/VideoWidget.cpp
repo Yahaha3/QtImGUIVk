@@ -10,14 +10,17 @@ clz::VideoWidget::VideoWidget(clz::ClzWidget *parent) : ClzWidget(parent)
 void clz::VideoWidget::init()
 {
     m_video_decode->set_video_file("D:/TEST/20230201_164749.mp4");
+    m_video_decode->update_decode_size(size().width(), size().height() - 38);
     m_video_decode->ffmpeg_init();
     m_video_decode->start();
 }
 
 void clz::VideoWidget::paint()
 {
-    ImGui::Begin(title().toStdString().c_str(), 0);
-    ImGui::SetWindowSize({(float)size().width(), (float)size().height()});
+    ImGui::SetNextWindowPos(impos());
+    ImGui::SetNextWindowSize(imsize());
+    ImGui::Begin(name().toStdString().c_str(), 0);
+    m_widget_fold = ImGui::IsWindowCollapsed();
     if(!m_video) return;
     auto ID = m_video->get_image_texture_id();
     if(ID){

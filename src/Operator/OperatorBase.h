@@ -6,6 +6,7 @@
 #include "Element/Layer/GraphicsLayer.h"
 #include "Element/GraphicsDrawElement.h"
 #include "GeoFunction/GeoMapGlobal.h"
+#include <QDateTime>
 
 // 用于存储element组合
 // 是直接呈现给用户的结构,signature对应的是数据绑定

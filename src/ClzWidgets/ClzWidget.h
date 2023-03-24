@@ -5,6 +5,7 @@
 #include "ClzCore/ClzObject.h"
 #include <QPoint>
 #include <QSize>
+#include "imgui.h"
 
 namespace clz {
 class ClzWidget : public ClzObject
@@ -13,11 +14,16 @@ class ClzWidget : public ClzObject
 public:
     ClzWidget(ClzWidget* parent = 0);
 
+    ImVec2 impos();
     QPoint pos();
-    QSize size();
-    QString title();
 
-    void set_widget_title(const QString& title);
+    QSize size();
+    ImVec2 imsize();
+
+    QString name();
+    bool fold();
+
+    void set_widget_name(const QString& name);
     void move(QPoint position);
     void resize(QSize size);
 
@@ -27,8 +33,9 @@ public:
 protected:
     QPoint m_position;
     QSize m_size;
-    QString m_title;
-
+    QString m_name;
+    bool m_widget_fold;
+    ImU32 m_window_flags;
 };
 }
 

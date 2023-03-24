@@ -50,6 +50,9 @@ public:
     //对象
     std::shared_ptr<TileManager> get_tile_manager() const;
 
+    // 需要一定时间准备的对象初始化
+    void sub_items_init();
+
 private:
     // 根据可视
     bool append_region(int z, double min_x, double min_y, double size_x, double size_y);

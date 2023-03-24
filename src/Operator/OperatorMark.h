@@ -34,7 +34,7 @@ private:
     bool m_has_trajectory = false;
     QString m_trajectory = clz::empty;
 
-    const QSize m_mark_size = QSize(40, 40);
+    const QSize m_mark_size = QSize(66, 66);
     double m_mark_azimuth;
 
     QMap<qint64, QPair<GeoPos, double>> m_interpolation_infos;
