@@ -204,12 +204,13 @@ void DemoWidget::layout_update()
     m_layout_bottom_function->relayout();
 }
 #include "KernelSupport/KernelInstanceData.h"
+#include "DataCenter/Function/CpsgrsDataCenter.h"
 void DemoWidget::hero_card_update()
 {
     bool ok = false;
     auto instance = m_ks->instance_data()->current_instance_data(ok);
     if(!ok) return;
-    m_hero_card->update_left_info("Auto");
+    m_hero_card->update_left_info(instance.current_mode());
     m_hero_card->update_right_info(instance.entity_name);
     m_hero_card->set_background_image(instance.entity_image);
     m_hero_card->paint();

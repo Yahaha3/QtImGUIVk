@@ -279,7 +279,7 @@ void QVulkanRenderer::init()
     init_info.CheckVkResultFn = check_vk_result;
     ImGui_ImplVulkan_Init(&init_info, wd_->RenderPass);
 
-    io.Fonts->AddFontFromFileTTF("D:/github/QtImGUIVk/3rdparty/font/simhei.ttf", 13, NULL, io.Fonts->GetGlyphRangesDefault());
+    io.Fonts->AddFontFromFileTTF("D:/github/QtImGUIVk/3rdparty/font/simhei.ttf", 13, NULL, io.Fonts->GetGlyphRangesChineseFull());
     {
         ImGui_ImplVulkan_CreateFontsTexture(cmdbuf);
 //        ImGui_ImplVulkan_DestroyFontUploadObjects();

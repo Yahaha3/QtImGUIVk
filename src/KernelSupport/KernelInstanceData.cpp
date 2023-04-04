@@ -54,3 +54,16 @@ void KernelInstanceData::clear_instance_data()
 {
     m_instances.clear();
 }
+
+QString InstanceData::current_mode() const
+{
+    auto cpsgrs = dynamic_cast<eqnx_dh::CpsgrsDataCenter*>(cpsgrs_function);
+    if(cpsgrs){
+#ifdef LANGUAGE_EN
+        return cpsgrs->kmode[eqnx_dh::name].toString();
+#else
+        return cpsgrs->kmode[eqnx_dh::name_i18n].toString();
+#endif
+    }
+    return QString();
+}

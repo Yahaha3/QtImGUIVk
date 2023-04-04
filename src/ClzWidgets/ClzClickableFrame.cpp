@@ -1,3 +1,5 @@
+﻿#pragma execution_character_set("utf-8")
+
 #include "ClzClickableFrame.h"
 #include "imgui.h"
 
@@ -28,10 +30,15 @@ void clz::ClzClickableFrame::paint()
     ImGui::SetNextWindowSize(imsize());
     ImGui::SetNextWindowBgAlpha(0.2f);
     ImGui::Begin(name().toStdString().c_str(), 0, m_window_flags);
+    auto right_width = ImGui::CalcTextSize(m_info_right.toStdString().c_str()).x;
+    auto width = ImGui::GetWindowWidth();
     if(m_frame_image){
         auto ID = m_frame_image->get_image_texture_id();
+//        QString info = "旋翼着陆";
         ImGui::Text(m_info_left.toStdString().c_str(), 0);
+//        ImGui::Text(info.toStdString().c_str(), 0);
         ImGui::SameLine();
+        ImGui::SetCursorPosX(width - right_width);
         ImGui::Text(m_info_right.toStdString().c_str(), 0);
         ImGui::Image(ID, imsize());
     }

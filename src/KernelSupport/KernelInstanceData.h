@@ -29,6 +29,8 @@ struct InstanceData {
     eqnx_dh::DataCenterBase* lscards_function = nullptr;
     // 3,较为通用的cpsgr模式请求,无返回值需求
     eqnx_dh::DataCenterBase* cpsgr_function = nullptr;
+
+    QString current_mode() const;
 };
 
 

@@ -120,22 +120,22 @@ ImPlotPoint GeoMap::geopos2implot(GeoPos pt)
 #include "ClzWidgets/ClzCardWidget.h"
 void GeoMap::test()
 {
-    static clz::ClzCardWidget* card = nullptr;
-    if(!card){
-        card = new clz::ClzCardWidget();
-        card->set_widget_name("test");
-        QStringList contexts = {"Context1"};
-        QStringList uris = {"Context/context"};
-        QJsonArray options = {QJsonObject()};
-        card->init_card(contexts, uris, options);
+//    static clz::ClzCardWidget* card = nullptr;
+//    if(!card){
+//        card = new clz::ClzCardWidget();
+//        card->set_widget_name("test");
+//        QStringList contexts = {"Context1"};
+//        QStringList uris = {"Context/context"};
+//        QJsonArray options = {QJsonObject()};
+//        card->init_card(contexts, uris, options);
 
-        card->move(QPoint(50,50));
-        card->resize(QSize(300,300));
-    }
-    static int count = -1;
-    count ++;
-    card->update_card("Context/context", count);
-    card->paint();
+//        card->move(QPoint(50,50));
+//        card->resize(QSize(300,300));
+//    }
+//    static int count = -1;
+//    count ++;
+//    card->update_card("Context/context", count);
+//    card->paint();
 }
 
 void GeoMap::map_timeout()

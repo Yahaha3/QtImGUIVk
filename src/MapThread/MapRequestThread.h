@@ -2,13 +2,13 @@
 #define MAPREQUESTTHREAD_H
 #include <iostream>
 #include <thread>
-#include <mutex>
 #include <QThread>
 #include <queue>
 #include <GeoFunction/GeoMapGlobal.h>
 #include <Database/ClzDataBaseManager.h>
 #include <QTimer>
 #include <QSet>
+#include <QMutex>
 
 class GeoBackend;
 namespace clz {
@@ -53,6 +53,7 @@ private slots:
     void slot_reqeuest_timeout();
 
 private:
+    QMutex m_request_mutex;
     QList<TilePos> m_queue;
     QList<TilePos> m_store_queue;
     QSet<QString> m_store_queue_keys;

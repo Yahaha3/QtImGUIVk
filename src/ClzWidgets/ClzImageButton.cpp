@@ -42,6 +42,27 @@ void clz::ClzImageButton::init()
     set_image_path(path);
 }
 
+//#include <Windows.h>
+//#include <WinNls.h>
+
+//std::string string_to_utf8(const std::string& str){
+//    int len = MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, NULL, 0);
+//    wchar_t* pw_buf = new wchar_t[len + 1];
+//    memset(pw_buf, 0, len * 2 + 2);
+//    MultiByteToWideChar(CP_ACP, 0, str.c_str(), str.length(), pw_buf, len);
+
+//    int nlen = WideCharToMultiByte(CP_UTF8, 0, pw_buf, -1, NULL, NULL, NULL, NULL);
+//    char* pbuf = new char[nlen + 1];
+//    memset(pbuf, 0, nlen + 1);
+//    WideCharToMultiByte(CP_UTF8, 0, pw_buf, len, pbuf, nlen, NULL, NULL);
+
+//    std::string ret = pbuf;
+//    delete [] pw_buf;
+//    delete [] pbuf;
+
+//    return ret;
+//}
+
 void clz::ClzImageButton::paint()
 {
     ImGui::SetNextWindowPos(impos());
@@ -60,10 +81,15 @@ void clz::ClzImageButton::paint()
             emit sig_image_btn_clicked(get_object_id());
         }
 
+//        QString info = "地面模式";
+
+        if(ImGui::IsWindowHovered()){
+            ImGui::SetTooltip(name().toStdString().c_str(), 0);
+        }
+
         ImGui::PopStyleColor(3);
         ImGui::PopID();
-
-        ImGui::Text(name().toStdString().c_str(), "");
+        ImGui::Text(name().toStdString().c_str(), 0);
     }
     ImGui::End();
 }

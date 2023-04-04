@@ -71,6 +71,7 @@ void KernelSupport::update_cpsgr_layout()
 #ifdef LANGUAGE_EN
             auto name = vdp[eqnx_dh::cfg_name].toString();
 #else
+            auto name = vdp[eqnx_dh::cfg_name_i18n].toString();
 #endif
             if(!cpsgr[eqnx_dh::by_button].toBool(false)){
                 // 可能需要填充右键菜单
@@ -103,8 +104,8 @@ void KernelSupport::update_card_layout()
             auto access = static_cast<aos::VariableAccessComboOptions>(def[eqnx_dh::access].toInt());
 //            if(access == aos::VariableAccessComboNone) continue;
             // 目前只考虑两级菜单
-            QStringList contexts, uris;
-            QJsonArray options;
+            QStringList contexts, uris, formats;
+            QList<QJsonArray> options;
             if(access == aos::VariableAccessComboLabel){
                 auto sitems = item[eqnx_dh::items].toArray();
                 for(auto sitem_: sitems){
@@ -116,18 +117,21 @@ void KernelSupport::update_card_layout()
 #ifdef LANGUAGE_EN
                     auto context = sdef[eqnx_dh::name].toString();
 #else
+                    auto context = sdef[eqnx_dh::name_i18n].toString();
 #endif
-                    auto option = sdef[eqnx_dh::options].toObject();
+                    auto format = sdef[eqnx_dh::format].toString();
+                    auto option = sdef[eqnx_dh::options].toArray();
                     auto uri = sdef[eqnx_dh::uri].toString();
                     contexts.append(context);
                     uris.append(uri);
+                    formats.append(format);
                     options.append(option);
                 }
                 if(!m_card_layout->contain_widget(csig)){
                     auto card = new clz::ClzCardWidget();
                     card->set_object_id(csig);
                     card->set_widget_name(title);
-                    card->init_card(contexts, uris, options);
+                    card->init_card(contexts, uris, formats, options);
                     connect(this, &KernelSupport::sig_kernel_state_data_update, card, &clz::ClzCardWidget::slot_card_data_update);
                     m_card_layout->add_widget(card);
                 }

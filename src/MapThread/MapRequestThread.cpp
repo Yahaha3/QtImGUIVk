@@ -29,9 +29,11 @@ void clz::MapRequestThread::run()
     while (!m_stop) {
         if(m_reload) continue;
         TilePos one;
+        QMutexLocker lock(&m_request_mutex);
         if(m_queue.empty()) continue;
         one = std::move(m_queue.front());
         m_queue.takeFirst();
+        lock.unlock();
         {
 //            std::cout << "query tile count in thread: " << m_working._My_val << std::endl;
             QString update_time;

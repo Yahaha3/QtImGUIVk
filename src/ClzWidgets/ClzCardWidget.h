@@ -17,7 +17,8 @@ public:
 
     bool init_card(const QStringList& context,
                    const QStringList& uri,
-                   const QJsonArray& options);
+                   const QStringList& formats,
+                   const QList<QJsonArray>& options);
     bool update_card(const QString& uri, QJsonValue value);
 
     void init() override;
@@ -30,12 +31,18 @@ public slots:
 private:
     // 左侧目录
     QStringList m_context;
+    // 路径列表
+    QStringList m_uris;
     // 路径与值的映射
     QHash<QString, QString> m_value_map;
     // 目录与路径的映射
     QHash<QString, QString> m_context_uri_map;
+    // 目录与格式的映射
+    QHash<QString, QString> m_context_format_map;
     // 目录与选项的映射
-    QHash<QString, QJsonObject> m_context_option_map;
+    QHash<QString, QJsonArray> m_context_option_map;
+
+    const QString m_colon = ":";
 };
 }
 

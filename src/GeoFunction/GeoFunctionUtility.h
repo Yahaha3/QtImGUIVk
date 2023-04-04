@@ -41,6 +41,8 @@ public:
     static QString kernel_apps_dir();
     static GeoPos get_target_lonlat_with_distance(const GeoPos& p0, const GeoPos& p1, double distance);
     static QString cpsgr_icon_path(const QString& icon);
+    static QString parse_format(const QJsonValue& value, const QString& format, bool& ok);
+    static QString parse_enum(const QJsonValue& value, const QJsonArray& option, bool& ok);
 
     // 其他常用工具
     template <typename TSet, typename TFlag>

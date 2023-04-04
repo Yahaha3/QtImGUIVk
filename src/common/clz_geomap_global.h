@@ -14,6 +14,9 @@ const QString layer_name_mission_phases                 = "LayerMissionPhases";
 const QString layer_name_mission_point_generated        = "LayerMissionGenerated";
 const QString layer_name_mission_point_engaged          = "LayerMissionEngaged";
 
+const QString value = "value";
+const QString note = "note";
+const QString note_i18n = "noteI180n";
 }
 
 #endif // CLZ_GEOMAP_GLOBAL_H

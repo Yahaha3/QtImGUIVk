@@ -2,6 +2,7 @@
 #include <qmath.h>
 #include "Map/Projection/Projection.h"
 #include <QFile>
+#include "common/clz_geomap_global.h"
 
 #define PI 3.14159265359
 
@@ -154,6 +155,7 @@ QByteArray clz::GeoFunctionUtility::get_image_bytearray(const QString &path, boo
 //所有内核相关的业务都放这里来转吧
 #include "AosKernelCommon.h"
 #include "algorithm_utilities.h"
+#include "aos_kernel_vardef_formatter_global.h"
 
 QString clz::GeoFunctionUtility::kernel_apps_dir()
 {
@@ -175,4 +177,48 @@ QString clz::GeoFunctionUtility::cpsgr_icon_path(const QString &icon)
     auto pre = aos::AosKernelCommon::get_installer_dir();
     auto path = pre + QString("/UX/csgrs/%1_64x64.png").arg(icon);
     return path;
+}
+
+QString clz::GeoFunctionUtility::parse_format(const QJsonValue &value, const QString &format, bool& ok)
+{
+    QString result;
+    if(format.isEmpty()) {
+        ok = false;
+        return QString();
+    }
+    ok = true;
+    auto vv = aos::VarDefFormatterPluginTypeHelper::parse_format(value, format);
+    if(vv.type() == QJsonValue::Double){
+        result = QString::number(vv.toDouble());
+    } else {
+        result = vv.toString();
+    }
+    return result;
+}
+
+QString clz::GeoFunctionUtility::parse_enum(const QJsonValue &value, const QJsonArray &option, bool& ok)
+{
+    if(option.isEmpty()){
+        ok = false;
+        return QString();
+    }
+    QString result;
+    if(value.isDouble()){
+        // 有可能并不是0-1-2-3-4-5-6....的值枚举
+        auto jv = value.toDouble();
+        for(auto option_ :option){
+            auto opt = option_.toObject();
+            auto ov = opt[clz::value].toDouble();
+            if(abs(ov - jv) < 1e-5){
+                ok = true;
+#if 1
+                result = opt[clz::note].toString();
+#else
+                result = opt[clz::note_i18n].toString();
+#endif
+                break;
+            }
+        }
+    }
+    return result;
 }
